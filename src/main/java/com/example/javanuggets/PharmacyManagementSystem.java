@@ -7,11 +7,12 @@ import java.util.*;
 import java.util.HashMap;
 
 
+
 public class PharmacyManagementSystem {
     private Connection connection;
-    private HashMap<String, Drug> drugs;
-    private HashMap<String, Supplier> suppliers;
-    private HashMap<String, Buyer> buyers;
+    private HashMap<Integer, Drug> drugs;
+    private HashMap<Integer, Supplier> suppliers;
+    private HashMap<Integer, Buyer> buyers;
     private ArrayList<Purchase> purchaseHistory;
 
     //Creating just name and id parameters for now
@@ -24,22 +25,28 @@ public class PharmacyManagementSystem {
         purchaseHistory = new ArrayList<>();
     }
 
-    private void loadDatabaseCredentials() throws IOException {
-        Properties properties = new Properties();
-        try (InputStream input = new FileInputStream(".env")) {
-            properties.load(input);
+    //Function to search supplier by location
+    public void searchSupplierByLocation(String location) {
+        List<Integer> supplierId = new ArrayList<>();
+
+        for (Supplier supplier : suppliers.values()) {
+            if (supplier.getLocation().equalsIgnoreCase(location)) {
+                supplierId.add(supplier.getId());
+            }
         }
 
-        String url = properties.getProperty("DB_URL");
-        String username = properties.getProperty("DB_USERNAME");
-        String password = properties.getProperty("DB_PASSWORD");
-
-        try {
-            connectToDatabase(url, username, password);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        for(int i = 0; i < supplierId.size(); i++){
+            System.out.println(supplierId.get(i));
         }
     }
+
+    //Function to add supplier to the hashtable
+    public void addSupplier(String name, String contactNumber, String location, String email) {
+        Supplier supplier = new Supplier(name, contactNumber, location, email);
+        int supplierID = supplier.getId();
+        suppliers.put(supplierID, supplier);
+    }
+
 
     public void searchDrug(String drugName) {
 
@@ -144,10 +151,14 @@ public class PharmacyManagementSystem {
 
 
 
-
     // Database connection setup
     public void connectToDatabase(String url, String username, String password) throws SQLException {
-        connection = DriverManager.getConnection(url, username, password);
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println("Database Connected Successfully");
+        } catch (SQLException error) {
+            System.out.println(error);
+        }
     }
 
 }
