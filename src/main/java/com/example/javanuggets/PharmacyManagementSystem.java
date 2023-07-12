@@ -94,53 +94,55 @@ public class PharmacyManagementSystem {
         }
     }
 
-        // Method to select a drug by its name and change its values in the collection and the database
-        public void editDrug(String drugName, String name) {
-            // Check if the drug is in the collection
-            if (!drugCollection.containsKey(drugName)) {
-                System.out.println("Drug not found in collection.");
-                return;
-            }
-            int drugId = drugCollection.get(drugName);
-            // Update the drug data in the collection
-            drugCollection.put(drugName, drugId);
-            // Update the drug data in the database
-            try {
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
-                //Can only change name for now
-                PreparedStatement pstmt = conn.prepareStatement("UPDATE drugs SET name = ? WHERE id = ?");
-                pstmt.setString(1, name);
-                pstmt.setInt(2, drugId);
-                pstmt.executeUpdate();
-                System.out.println("Drug data updated in collection and database.");
-                conn.close();
-            } catch (SQLException e) {
-                System.out.println("Database connection error: " + e.getMessage());
-            }
+    // Method to select a drug by its name and change its values in the collection and the database
+    public void editDrug(String drugName, String name) {
+        // Check if the drug is in the collection
+        if (!drugCollection.containsKey(drugName)) {
+            System.out.println("Drug not found in collection.");
+            return;
         }
+        int drugId = drugCollection.get(drugName);
+        // Update the drug data in the collection
+        drugCollection.put(drugName, drugId);
+        // Update the drug data in the database
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
+            //Can only change name for now
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE drugs SET name = ? WHERE id = ?");
+            pstmt.setString(1, name);
+            pstmt.setInt(2, drugId);
+            pstmt.executeUpdate();
+            System.out.println("Drug data updated in collection and database.");
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Database connection error: " + e.getMessage());
+        }
+    }
 
 
-        public void deleteDrug(String drugName) {
-            // Check if the drug is in the collection
-            if (!drugCollection.containsKey(drugName)) {
-                System.out.println("Drug not found in collection.");
-                return;
-            }
-            int drugId = drugCollection.get(drugName);
-            // Remove the drug from the collection
-            drugCollection.remove(drugName);
-            // Delete the drug data from the database
-            try {
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
-                PreparedStatement pstmt = conn.prepareStatement("DELETE FROM drugs WHERE id = ?");
-                pstmt.setInt(1, drugId);
-                pstmt.executeUpdate();
-                System.out.println("Drug deleted from collection and database.");
-                conn.close();
-            } catch (SQLException e) {
-                System.out.println("Database connection error: " + e.getMessage());
-            }
+    public void deleteDrug(String drugName) {
+        // Check if the drug is in the collection
+        if (!drugCollection.containsKey(drugName)) {
+            System.out.println("Drug not found in collection.");
+            return;
         }
+        int drugId = drugCollection.get(drugName);
+        // Remove the drug from the collection
+        drugCollection.remove(drugName);
+        // Delete the drug data from the database
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
+            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM drugs WHERE id = ?");
+            pstmt.setInt(1, drugId);
+            pstmt.executeUpdate();
+            System.out.println("Drug deleted from collection and database.");
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println("Database connection error: " + e.getMessage());
+        }
+    }
+
+
 
 
     // Database connection setup
