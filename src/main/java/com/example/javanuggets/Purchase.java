@@ -3,11 +3,13 @@ package com.example.javanuggets;
 import java.util.Date;
 
 public class Purchase {
+    private static int count = 1;
     private String purchaseID;
     private String drugID;
     private String buyerID;
     private Date purchaseDate;
     private int quantity;
+    private int id;
 
     public Purchase(String purchaseID, String drugID, String buyerID, Date purchaseDate, int quantity) {
         this.purchaseID = purchaseID;
@@ -15,10 +17,14 @@ public class Purchase {
         this.buyerID = buyerID;
         this.purchaseDate = purchaseDate;
         this.quantity = quantity;
+        this.id = count++;
     }
 
     // Getters and setters
 
+    public int getId() {
+        return this.id;
+    }
     public String getPurchaseID() {
         return purchaseID;
     }
