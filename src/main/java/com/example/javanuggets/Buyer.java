@@ -1,16 +1,22 @@
 package com.example.javanuggets;
 
 public class Buyer {
+    private static int count = 1;
     private String buyerName;
     private String contactNumber;
+    private int id;
 
     public Buyer(String buyerName, String contactNumber) {
         this.buyerName = buyerName;
         this.contactNumber = contactNumber;
+        this.id = count++;
     }
 
     // Getters and setters
 
+    public int getId(){
+        return this.id;
+    }
     public String getBuyerName() {
         return buyerName;
     }
