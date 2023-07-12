@@ -6,6 +6,7 @@ import java.sql.*;
 import java.util.*;
 
 
+
 public class PharmacyManagementSystem {
     private Connection connection;
     private HashMap<String, Drug> drugs;
@@ -20,26 +21,15 @@ public class PharmacyManagementSystem {
         purchaseHistory = new ArrayList<>();
     }
 
-    private void loadDatabaseCredentials() throws IOException {
-        Properties properties = new Properties();
-        try (InputStream input = new FileInputStream(".env")) {
-            properties.load(input);
-        }
-
-        String url = properties.getProperty("DB_URL");
-        String username = properties.getProperty("DB_USERNAME");
-        String password = properties.getProperty("DB_PASSWORD");
-
-        try {
-            connectToDatabase(url, username, password);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     // Database connection setup
     public void connectToDatabase(String url, String username, String password) throws SQLException {
-        connection = DriverManager.getConnection(url, username, password);
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println("Database Connected Successfully");
+        } catch (SQLException error) {
+            System.out.println(error);
+        }
     }
 
     // method for searching supplier collection by location
