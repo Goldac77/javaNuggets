@@ -1,6 +1,7 @@
 module com.example.javanuggets {
     requires javafx.controls;
     requires javafx.fxml;
+
     requires java.sql;
             
                             
