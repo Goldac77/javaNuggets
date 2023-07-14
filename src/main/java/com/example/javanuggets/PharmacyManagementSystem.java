@@ -4,6 +4,7 @@ package com.example.javanuggets;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.HashMap;
 
 
 
@@ -43,6 +44,92 @@ public class PharmacyManagementSystem {
         suppliers.put(supplierID, supplier);
     }
 
+    // Method to add drug
+    public void addDrug(Drug drug) {
+        drugs.put(drug.getId(), drug);
+        System.out.println("Drug added successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+    }
+
+    // Method to search drug
+    public void searchDrug(String name) {
+        boolean found = false;
+        for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
+            Drug drug = entry.getValue();
+            if (drug.getDrugName().equalsIgnoreCase(name)) {
+                System.out.println("Drug found: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No drug found with name: " + name);
+        }
+    }
+
+    // Method to edit drug
+    public void editDrug(String name, String supplierID, double unitPrice, int quantity) {
+        boolean found = false;
+        for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
+            Drug drug = entry.getValue();
+            if (drug.getDrugName().equalsIgnoreCase(name)) {
+                drug.setSupplierID(supplierID);
+                drug.setUnitPrice(unitPrice);
+                drug.setQuantity(quantity);
+                System.out.println("Drug edited successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No drug found with name: " + name);
+        }
+    }
+
+    //Method to delete drug
+    public void deleteDrug(String name) {
+        boolean found = false;
+        Iterator<Map.Entry<Integer, Drug>> iterator = drugs.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Drug> entry = iterator.next();
+            Drug drug = entry.getValue();
+            if (drug.getDrugName().equalsIgnoreCase(name)) {
+                iterator.remove();
+                System.out.println("Drug deleted successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("No drug found with name: " + name);
+        }
+    }
+
+    // Bonus method, i wanted to make sure the delete method actually removed the drug
+    public void listDrugs() {
+        System.out.println("Drug list");
+        for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
+            Drug drug = entry.getValue();
+            System.out.println(drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+        }
+    }
+/**
+    // I'm leaving this here so u can test it urself Nick!!! stare......
+    // U see my face...
+
+    public static void main(String[] args) {
+
+        PharmacyManagementSystem ps = new PharmacyManagementSystem();
+
+        Drug drug1 = new Drug("Drug1", "Supplier1", 10.0, 100);
+        Drug drug2 = new Drug("Drug2", "Supplier2", 20.0, 200);
+        Drug drug3 = new Drug("Drug3", "Supplier3", 30.0, 300);
+
+        ps.addDrug(drug1);
+        ps.addDrug(drug2);
+        ps.addDrug(drug3);
+
+        ps.searchDrug("Drug2");
+        ps.editDrug("Drug3", "sup", 233, 20);
+        ps.deleteDrug("Drug2");
+        ps.listDrugs();
+    } **/
 
     // Database connection setup
     public void connectToDatabase(String url, String username, String password) throws SQLException {
