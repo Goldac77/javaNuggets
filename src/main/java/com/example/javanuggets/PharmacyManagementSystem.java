@@ -15,9 +15,6 @@ public class PharmacyManagementSystem {
     private HashMap<Integer, Buyer> buyers;
     private ArrayList<Purchase> purchaseHistory;
 
-    //Creating just name and id parameters for now
-    private HashMap<String, Integer> drugCollection;
-
     public PharmacyManagementSystem() {
         drugs = new HashMap<>();
         suppliers = new HashMap<>();
@@ -47,109 +44,92 @@ public class PharmacyManagementSystem {
         suppliers.put(supplierID, supplier);
     }
 
+    // Method to add drug
+    public void addDrug(Drug drug) {
+        drugs.put(drug.getId(), drug);
+        System.out.println("Drug added successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+    }
 
-    public void searchDrug(String drugName) {
-
-        // Check if the drug is in the collection
-        if (drugCollection.containsKey(drugName)) {
-            int drugId = drugCollection.get(drugName);
-            // Connect to the database and retrieve the drug information
-            try {
-                Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
-                Statement stmt = conn.createStatement();
-                String sql = "SELECT * FROM drugs WHERE id = " + drugId;
-                ResultSet rs = stmt.executeQuery(sql);
-
-                // Print the drug information from the collection and the database
-                System.out.println("Drug information from the collection:");
-                System.out.println(drugName + " ID: " + drugId);
-                System.out.println("Drug information from the database:");
-                while (rs.next()) {
-                    System.out.println(rs.getString("name") + " (ID: " + rs.getInt("id") + ")");
-                }
-                conn.close();
-            } catch (SQLException e) {
-                System.out.println("Database connection error: " + e.getMessage());
+    // Method to search drug
+    public void searchDrug(String name) {
+        boolean found = false;
+        for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
+            Drug drug = entry.getValue();
+            if (drug.getDrugName().equalsIgnoreCase(name)) {
+                System.out.println("Drug found: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                found = true;
             }
-        } else {
-            System.out.println("Drug not found in collection.");
+        }
+        if (!found) {
+            System.out.println("No drug found with name: " + name);
         }
     }
 
-    //Method to add drugs, used only name and id, will update later
-    public void addDrug(String drugName, int drugId ) {
-        // Check if the drug is already in the collection
-        if (drugCollection.containsKey(drugName)) {
-            System.out.println("Drug already exists in collection.");
-            return;
+    // Method to edit drug
+    public void editDrug(String name, String supplierID, double unitPrice, int quantity) {
+        boolean found = false;
+        for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
+            Drug drug = entry.getValue();
+            if (drug.getDrugName().equalsIgnoreCase(name)) {
+                drug.setSupplierID(supplierID);
+                drug.setUnitPrice(unitPrice);
+                drug.setQuantity(quantity);
+                System.out.println("Drug edited successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                found = true;
+            }
         }
-        // Add the drug to the collection
-        drugCollection.put(drugName, drugId);
-
-        // Insert the drug data into the database
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO drugs (id, name) VALUES (?, ?, ?, ?, ?)");
-            pstmt.setInt(1, drugId);
-            pstmt.setString(2, drugName);
-
-            pstmt.executeUpdate();
-            System.out.println("Drug added to collection and database.");
-            conn.close();
-        } catch (SQLException e) {
-            System.out.println("Database connection error: " + e.getMessage());
+        if (!found) {
+            System.out.println("No drug found with name: " + name);
         }
     }
 
-    // Method to select a drug by its name and change its values in the collection and the database
-    public void editDrug(String drugName, String name) {
-        // Check if the drug is in the collection
-        if (!drugCollection.containsKey(drugName)) {
-            System.out.println("Drug not found in collection.");
-            return;
+    //Method to delete drug
+    public void deleteDrug(String name) {
+        boolean found = false;
+        Iterator<Map.Entry<Integer, Drug>> iterator = drugs.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Drug> entry = iterator.next();
+            Drug drug = entry.getValue();
+            if (drug.getDrugName().equalsIgnoreCase(name)) {
+                iterator.remove();
+                System.out.println("Drug deleted successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                found = true;
+            }
         }
-        int drugId = drugCollection.get(drugName);
-        // Update the drug data in the collection
-        drugCollection.put(drugName, drugId);
-        // Update the drug data in the database
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
-            //Can only change name for now
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE drugs SET name = ? WHERE id = ?");
-            pstmt.setString(1, name);
-            pstmt.setInt(2, drugId);
-            pstmt.executeUpdate();
-            System.out.println("Drug data updated in collection and database.");
-            conn.close();
-        } catch (SQLException e) {
-            System.out.println("Database connection error: " + e.getMessage());
+        if (!found) {
+            System.out.println("No drug found with name: " + name);
         }
     }
 
-
-    public void deleteDrug(String drugName) {
-        // Check if the drug is in the collection
-        if (!drugCollection.containsKey(drugName)) {
-            System.out.println("Drug not found in collection.");
-            return;
-        }
-        int drugId = drugCollection.get(drugName);
-        // Remove the drug from the collection
-        drugCollection.remove(drugName);
-        // Delete the drug data from the database
-        try {
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/drug_db", "user", "password");
-            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM drugs WHERE id = ?");
-            pstmt.setInt(1, drugId);
-            pstmt.executeUpdate();
-            System.out.println("Drug deleted from collection and database.");
-            conn.close();
-        } catch (SQLException e) {
-            System.out.println("Database connection error: " + e.getMessage());
+    // Bonus method, i wanted to make sure the delete method actually removed the drug
+    public void listDrugs() {
+        System.out.println("Drug list");
+        for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
+            Drug drug = entry.getValue();
+            System.out.println(drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
         }
     }
+/**
+    // I'm leaving this here so u can test it urself Nick!!! stare......
+    // U see my face...
 
+    public static void main(String[] args) {
 
+        PharmacyManagementSystem ps = new PharmacyManagementSystem();
+
+        Drug drug1 = new Drug("Drug1", "Supplier1", 10.0, 100);
+        Drug drug2 = new Drug("Drug2", "Supplier2", 20.0, 200);
+        Drug drug3 = new Drug("Drug3", "Supplier3", 30.0, 300);
+
+        ps.addDrug(drug1);
+        ps.addDrug(drug2);
+        ps.addDrug(drug3);
+
+        ps.searchDrug("Drug2");
+        ps.editDrug("Drug3", "sup", 233, 20);
+        ps.deleteDrug("Drug2");
+        ps.listDrugs();
+    } **/
 
     // Database connection setup
     public void connectToDatabase(String url, String username, String password) throws SQLException {
