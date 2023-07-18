@@ -1,7 +1,6 @@
 package com.example.javanuggets;
 
 
-import java.io.*;
 import java.sql.*;
 import java.util.*;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class PharmacyManagementSystem {
     // Method to add drug
     public void addDrug(Drug drug) {
         drugs.put(drug.getId(), drug);
-        System.out.println("Drug added successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+        System.out.println("Drug added successfully: " + drug.getDrugName() + ", " + drug.getSupplierName() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
     }
 
     // Method to search drug
@@ -56,7 +55,7 @@ public class PharmacyManagementSystem {
         for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
             Drug drug = entry.getValue();
             if (drug.getDrugName().equalsIgnoreCase(name)) {
-                System.out.println("Drug found: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                System.out.println("Drug found: " + drug.getDrugName() + ", " + drug.getSupplierName() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
                 found = true;
             }
         }
@@ -71,10 +70,10 @@ public class PharmacyManagementSystem {
         for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
             Drug drug = entry.getValue();
             if (drug.getDrugName().equalsIgnoreCase(name)) {
-                drug.setSupplierID(supplierID);
+                drug.setSupplierName(supplierID);
                 drug.setUnitPrice(unitPrice);
                 drug.setQuantity(quantity);
-                System.out.println("Drug edited successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                System.out.println("Drug edited successfully: " + drug.getDrugName() + ", " + drug.getSupplierName() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
                 found = true;
             }
         }
@@ -92,7 +91,7 @@ public class PharmacyManagementSystem {
             Drug drug = entry.getValue();
             if (drug.getDrugName().equalsIgnoreCase(name)) {
                 iterator.remove();
-                System.out.println("Drug deleted successfully: " + drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+                System.out.println("Drug deleted successfully: " + drug.getDrugName() + ", " + drug.getSupplierName() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
                 found = true;
             }
         }
@@ -106,7 +105,7 @@ public class PharmacyManagementSystem {
         System.out.println("Drug list");
         for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
             Drug drug = entry.getValue();
-            System.out.println(drug.getDrugName() + ", " + drug.getSupplierID() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
+            System.out.println(drug.getDrugName() + ", " + drug.getSupplierName() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
         }
     }
 /**
