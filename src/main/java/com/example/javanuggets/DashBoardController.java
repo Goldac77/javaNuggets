@@ -15,6 +15,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class DashBoardController {
 
@@ -112,7 +115,7 @@ public class DashBoardController {
     private Spinner<?> New_spinner;
 
     @FXML
-    private TextField New_supplierID;
+    private TextField New_supplierName;
 
     @FXML
     private Button Purchase_tab;
@@ -180,8 +183,22 @@ public class DashBoardController {
     @FXML
     private Button closeBtn;
 
+    //Database credentials
+    String url = "jdbc:mysql://localhost:3306/pharmacy";
+    String username = "root";
+    String password = "PASSWORD";
+    Connection connection;
 
 
+    //Method to connect to Database
+    public void connectToDatabase(String url, String username, String password) throws SQLException {
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println("Database Connected Successfully");
+        } catch (SQLException error) {
+            System.out.println(error);
+        }
+    }
 
 
     //switching between screens

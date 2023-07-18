@@ -49,7 +49,7 @@
                         <Button fx:id="Sign_out" layoutX="10.0" layoutY="307.0" mnemonicParsing="false" onAction="#Sign_out" prefHeight="30.0" prefWidth="70.0" styleClass="logOut" stylesheets="@../../../style.css" text="Sign Out" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="Drugs_form" layoutX="216.0" layoutY="7.0" prefHeight="440.0" prefWidth="529.0">
+                  <AnchorPane fx:id="Drugs_form" layoutX="216.0" layoutY="7.0" prefHeight="440.0" prefWidth="529.0" visible="false">
                      <children>
                         <AnchorPane layoutX="13.0" layoutY="8.0" prefHeight="92.0" prefWidth="504.0" styleClass="header" stylesheets="@../../../style.css">
                            <children>
@@ -78,7 +78,7 @@
                         <Button fx:id="Drugs_delete" layoutX="165.0" layoutY="119.0" mnemonicParsing="false" onAction="#Drugs_add" prefHeight="25.0" prefWidth="61.0" styleClass="cancelBtn" stylesheets="@../../../style.css" text="DELETE" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="New_form" layoutX="214.0" layoutY="6.0" prefHeight="440.0" prefWidth="529.0" visible="false">
+                  <AnchorPane fx:id="New_form" layoutX="214.0" layoutY="6.0" prefHeight="440.0" prefWidth="529.0">
                      <children>
                         <AnchorPane layoutX="53.0" layoutY="111.0" prefHeight="218.0" prefWidth="407.0" styleClass="new" stylesheets="@../../../style.css">
                            <children>
@@ -96,8 +96,8 @@
                                     </Label>
                                  </children>
                               </AnchorPane>
-                              <Label layoutX="7.0" layoutY="49.0" text="Supplier ID:" />
-                              <TextField fx:id="New_supplierID" layoutX="71.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="7.0" layoutY="49.0" text="Supplier Name" />
+                              <TextField fx:id="New_supplierName" layoutX="71.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
                               <Label layoutX="6.0" layoutY="87.0" text="Drug Name:" />
                               <TextField fx:id="New_drugName" layoutX="70.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
                               <Label layoutX="248.0" layoutY="49.0" text="Price:" />

@@ -3,14 +3,14 @@ package com.example.javanuggets;
 public class Drug {
     private static int count = 1;
     private String drugName;
-    private String supplierID;
+    private String supplierName;
     private double unitPrice;
     private int quantity;
     private int id;
 
-    public Drug(String drugName, String supplierID, double unitPrice, int quantity) {
+    public Drug(String drugName, String supplierName, double unitPrice, int quantity) {
         this.drugName = drugName;
-        this.supplierID = supplierID;
+        this.supplierName = supplierName;
         this.unitPrice = unitPrice;
         this.quantity = quantity;
         this.id = count++;
@@ -29,12 +29,12 @@ public class Drug {
         this.drugName = drugName;
     }
 
-    public String getSupplierID() {
-        return supplierID;
+    public String getSupplierName() {
+        return supplierName;
     }
 
-    public void setSupplierID(String supplierID) {
-        this.supplierID = supplierID;
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 
     public double getUnitPrice() {
