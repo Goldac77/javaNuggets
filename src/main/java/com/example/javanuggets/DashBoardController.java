@@ -163,6 +163,15 @@ public class DashBoardController {
     private Button Supplier_tab;
 
     @FXML
+    private Button supplier_add;
+
+    @FXML
+    private Button supplier_cancel;
+
+    @FXML
+    private AnchorPane supplier_addForm;
+
+    @FXML
     private Button Update_cancel;
 
     @FXML
@@ -303,6 +312,32 @@ public class DashBoardController {
         Purchases_form.setVisible(true);
         AddPurchase_form.setVisible(false);
         Supplier_form.setVisible(false);
+    }
+
+    public void addSupplier(ActionEvent event){
+        if(event.getSource() == supplier_add){
+            Drugs_form.setVisible(false);
+            New_form.setVisible(false);
+            Update_form.setVisible(false);
+            Delete_form.setVisible(false);
+            Purchases_form.setVisible(false);
+            AddPurchase_form.setVisible(false);
+            Supplier_form.setVisible(true);
+            supplier_addForm.setVisible(true);
+        }
+    }
+
+    public void cancelSupplier(ActionEvent event){
+        if(event.getSource() == supplier_cancel){
+            Drugs_form.setVisible(false);
+            New_form.setVisible(false);
+            Update_form.setVisible(false);
+            Delete_form.setVisible(false);
+            Purchases_form.setVisible(false);
+            AddPurchase_form.setVisible(false);
+            Supplier_form.setVisible(true);
+            supplier_addForm.setVisible(false);
+        }
     }
     public void closeBtn(){
         System.exit(0);
