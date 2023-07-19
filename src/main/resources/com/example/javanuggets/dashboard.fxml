@@ -49,7 +49,7 @@
                         <Button fx:id="Sign_out" layoutX="10.0" layoutY="307.0" mnemonicParsing="false" onAction="#Sign_out" prefHeight="30.0" prefWidth="70.0" styleClass="logOut" stylesheets="@../../../style.css" text="Sign Out" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="Drugs_form" layoutX="216.0" layoutY="7.0" prefHeight="440.0" prefWidth="529.0" visible="false">
+                  <AnchorPane fx:id="Drugs_form" layoutX="216.0" layoutY="7.0" prefHeight="440.0" prefWidth="529.0">
                      <children>
                         <AnchorPane layoutX="13.0" layoutY="8.0" prefHeight="92.0" prefWidth="504.0" styleClass="header" stylesheets="@../../../style.css">
                            <children>
@@ -78,7 +78,7 @@
                         <Button fx:id="Drugs_delete" layoutX="165.0" layoutY="119.0" mnemonicParsing="false" onAction="#Drugs_add" prefHeight="25.0" prefWidth="61.0" styleClass="cancelBtn" stylesheets="@../../../style.css" text="DELETE" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="New_form" layoutX="214.0" layoutY="6.0" prefHeight="440.0" prefWidth="529.0">
+                  <AnchorPane fx:id="New_form" layoutX="214.0" layoutY="6.0" prefHeight="440.0" prefWidth="529.0" visible="false">
                      <children>
                         <AnchorPane layoutX="53.0" layoutY="111.0" prefHeight="218.0" prefWidth="407.0" styleClass="new" stylesheets="@../../../style.css">
                            <children>
@@ -96,8 +96,8 @@
                                     </Label>
                                  </children>
                               </AnchorPane>
-                              <Label layoutX="7.0" layoutY="49.0" text="Supplier Name" />
-                              <TextField fx:id="New_supplierName" layoutX="71.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="3.0" layoutY="49.0" text="Supplier Name:" />
+                              <TextField fx:id="New_supplierName" layoutX="87.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
                               <Label layoutX="6.0" layoutY="87.0" text="Drug Name:" />
                               <TextField fx:id="New_drugName" layoutX="70.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
                               <Label layoutX="248.0" layoutY="49.0" text="Price:" />
@@ -131,10 +131,10 @@
                                     </Label>
                                  </children>
                               </AnchorPane>
-                              <Label layoutX="7.0" layoutY="49.0" text="Supplier ID:" />
-                              <TextField fx:id="Update_supplierID" layoutX="71.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
-                              <Label layoutX="6.0" layoutY="87.0" text="Drug Name:" />
-                              <TextField fx:id="Update_drugName" layoutX="70.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="7.0" layoutY="49.0" text="Supplier Name:" />
+                              <TextField fx:id="Update_supplierID" layoutX="94.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="25.0" layoutY="87.0" text="Drug Name:" />
+                              <TextField fx:id="Update_drugName" layoutX="94.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
                               <Label layoutX="248.0" layoutY="49.0" text="Price:" />
                               <TextField fx:id="Update_price" layoutX="280.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" promptText="\$0.0" />
                               <Button fx:id="Update_updateBtn" layoutX="43.0" layoutY="161.0" mnemonicParsing="false" styleClass="UpdateBtn" stylesheets="@../../../style.css" text="UPDATE" />
@@ -277,6 +277,44 @@
                            </children>
                         </AnchorPane>
                         <TextField fx:id="Supplier_search" layoutX="357.0" layoutY="116.0" prefHeight="25.0" prefWidth="158.0" promptText="search by name" styleClass="search-bar" stylesheets="@../../../style.css" />
+                        <Button fx:id="supplier_add" layoutX="15.0" layoutY="116.0" mnemonicParsing="false" onAction="#addSupplier" prefHeight="25.0" prefWidth="61.0" styleClass="addBtn" stylesheets="@../../../style.css" text="ADD" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane fx:id="supplier_addForm" layoutX="226.0" layoutY="14.0" prefHeight="440.0" prefWidth="529.0" visible="false">
+                     <children>
+                        <AnchorPane layoutX="53.0" layoutY="111.0" prefHeight="218.0" prefWidth="407.0" styleClass="new" stylesheets="@../../../style.css">
+                           <children>
+                              <AnchorPane layoutX="2.0" prefHeight="36.0" prefWidth="425.0" styleClass="header" stylesheets="@../../../style.css">
+                                 <children>
+                                    <Label layoutX="42.0" layoutY="5.0" text="ADD SUPPLIERS">
+                                       <font>
+                                          <Font name="Arial Black" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="22.0" layoutY="5.0" scaleX="1.5" scaleY="1.5" text="+">
+                                       <font>
+                                          <Font name="Arial Black" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </AnchorPane>
+                              <Label layoutX="7.0" layoutY="91.0" text="Supplier Name:" />
+                              <TextField fx:id="Update_supplierID1" layoutX="91.0" layoutY="88.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="25.0" layoutY="50.0" text="Supplier ID:" />
+                              <TextField fx:id="Update_drugName1" layoutX="90.0" layoutY="47.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="239.0" layoutY="49.0" text="Contact:" />
+                              <TextField fx:id="Update_price1" layoutX="286.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Button fx:id="supplier_cancel" layoutX="144.0" layoutY="162.0" mnemonicParsing="false" onAction="#cancelSupplier" styleClass="cancelBtn" stylesheets="@../../../style.css" text="CANCEL" />
+                              <Button layoutX="48.0" layoutY="162.0" mnemonicParsing="false" onAction="#Drugs_add" prefHeight="25.0" prefWidth="61.0" styleClass="addBtn" stylesheets="@../../../style.css" text="ADD" />
+                              <Label layoutX="234.0" layoutY="87.0" text="Location:" />
+                              <TextField fx:id="Update_price11" layoutX="286.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="250.0" layoutY="128.0" text="Email:" />
+                              <TextField fx:id="Update_price111" layoutX="286.0" layoutY="125.0" prefHeight="25.0" prefWidth="138.0" />
+                           </children>
+                           <effect>
+                              <DropShadow spread="0.25" />
+                           </effect>
+                        </AnchorPane>
                      </children>
                   </AnchorPane>
                </children>
