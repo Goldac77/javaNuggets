@@ -193,6 +193,12 @@ public class DashBoardController {
     @FXML
     private Button closeBtn;
 
+    public TextField AddSupplierName;
+    public TextField AddSupplierEmail;
+    public TextField AddSupplierContact;
+    public TextField AddSupplierLocation;
+    public Button addSupplier_btn;
+
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
@@ -222,7 +228,7 @@ public class DashBoardController {
 
 
     @FXML
-    private void handleAddButtonAction(ActionEvent event) {
+    private void handleAddDrugButtonAction(ActionEvent event) {
         if(event.getSource() == New_add) {
             // Retrieve values from text fields and spinner
             String supplierName = New_supplierName.getText();
@@ -310,6 +316,72 @@ public class DashBoardController {
             System.out.println("Database Connected Successfully");
         } catch (SQLException error) {
             System.out.println(error);
+        }
+    }
+
+    public void handleAddSupplierButtonAction(ActionEvent event) {
+        if(event.getSource() == addSupplier_btn) {
+            String supplierName = AddSupplierName.getText();
+            String supplierEmail = AddSupplierEmail.getText();
+            String supplierContact = AddSupplierContact.getText();
+            String supplierLocation = AddSupplierLocation.getText();
+
+            Supplier newSupplier = new Supplier(supplierName, supplierContact, supplierLocation, supplierEmail);
+            int supplierID = newSupplier.getId();
+
+            //Add supplier to the supplier hashmap
+            supplierHashMap.put(supplierID, newSupplier);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Supplier Added");
+            alert.setHeaderText(null);
+            alert.setContentText("Supplier added successfully!");
+            alert.showAndWait();
+
+            // Clear text fields and spinner value
+            AddSupplierName.clear();
+            AddSupplierEmail.clear();
+            AddSupplierContact.clear();
+            AddSupplierLocation.clear();
+
+            // inserting into drugs table
+            String insertQuery = "INSERT INTO suppliers (supplier_id, supplier_name, contact_number, email, location) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = null;
+            try{
+                // Prepare the statement
+                preparedStatement = connection.prepareStatement(insertQuery);
+                preparedStatement.setInt(1, supplierID);
+                preparedStatement.setString(2, supplierName);
+                preparedStatement.setString(3, supplierContact);
+                preparedStatement.setString(4, supplierEmail);
+                preparedStatement.setString(5, supplierLocation);
+                // Execute the statement
+                preparedStatement.executeUpdate();
+                System.out.println("Data inserted successfully!");
+
+            }
+            catch (SQLException e) {
+                System.err.println("Error occurred while inserting data into the database: " + e.getMessage());
+            }
+            finally {
+                // Close the prepared statement
+                if (preparedStatement != null) {
+                    try {
+                        preparedStatement.close();
+                    } catch (SQLException e) {
+                        System.err.println("Error occurred while closing prepared statement: " + e.getMessage());
+                    }
+                }
+
+                // Close the database connection
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        System.err.println("Error occurred while closing database connection: " + e.getMessage());
+                    }
+                }
+            }
         }
     }
 
