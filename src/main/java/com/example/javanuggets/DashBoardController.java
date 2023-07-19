@@ -1,15 +1,13 @@
 package com.example.javanuggets;
 
+import java.sql.PreparedStatement;
+import java.util.HashMap;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -111,8 +109,11 @@ public class DashBoardController {
     @FXML
     private TextField New_price;
 
+   /* @FXML
+    private Spinner<?> New_spinner;*/
+
     @FXML
-    private Spinner<?> New_spinner;
+    private Spinner<Integer> New_spinner;
 
     @FXML
     private TextField New_supplierName;
@@ -182,6 +183,111 @@ public class DashBoardController {
 
     @FXML
     private Button closeBtn;
+
+
+
+    @FXML
+    private void initialize() {
+        // Set up the Spinner value factory from 0 - 100
+        SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0);
+        New_spinner.setValueFactory(valueFactory);
+    }
+
+    @FXML
+    private HashMap<Integer, Drug> drugHashTable;
+
+    @FXML
+    private HashMap<Integer, Supplier> supplierHashMap;
+
+    public DashBoardController() {
+        drugHashTable = new HashMap<>();
+        // Spinner<?> newSpinner = new Spinner<>();
+        supplierHashMap = new HashMap<>();
+
+    }
+
+
+    @FXML
+    private void handleAddButtonAction() {
+        // Retrieve values from text fields and spinner
+        String supplierName = New_supplierName.getText();
+        double price = Double.parseDouble(New_price.getText());
+        String drugName = New_drugName.getText();
+        int quantity = New_spinner.getValue(); // Not sure about spinner
+        int supplierID = findSupplierKeyByName(supplierName);
+
+
+        // Create a new drug object
+        Drug newDrug = new Drug(drugName, supplierName, price, quantity);
+
+        // Add drug object to the hash table
+        drugHashTable.put(newDrug.getId(), newDrug);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Drugs Added");
+        alert.setHeaderText(null);
+        alert.setContentText("Drugs added successfully!");
+        alert.showAndWait();
+
+        // Clear text fields and spinner value
+        New_supplierName.clear();
+        New_price.clear();
+        New_drugName.clear();
+        New_spinner.getValueFactory().setValue(null);
+
+        // inserting into drugs table
+        String insertQuery = "INSERT INTO drugs (drug_id, drug_name, supplier_id, unit_price, quantity) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = null;
+        try{
+            // Prepare the statement
+            preparedStatement = connection.prepareStatement(insertQuery);
+            preparedStatement.setInt(1, newDrug.getId());
+            preparedStatement.setString(2, drugName);
+            preparedStatement.setInt(3, supplierID); //  About to implement suppliers  hash table
+            preparedStatement.setDouble(4, price);
+            preparedStatement.setInt(5, quantity);
+            // Execute the statement
+            preparedStatement.executeUpdate();
+            System.out.println("Data inserted successfully!");
+
+        }
+        catch (SQLException e) {
+            System.err.println("Error occurred while inserting data into the database: " + e.getMessage());
+        }
+        finally {
+            // Close the prepared statement
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    System.err.println("Error occurred while closing prepared statement: " + e.getMessage());
+                }
+            }
+
+            // Close the database connection
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    System.err.println("Error occurred while closing database connection: " + e.getMessage());
+                }
+            }
+        }
+
+    }
+
+    public int findSupplierKeyByName(String supplierName) {
+        for (int key : supplierHashMap.keySet()) {
+            Supplier supplier = supplierHashMap.get(key);
+            if (supplier.getSupplierName().equals(supplierName)) {
+                return key;
+            }
+        }
+        return -1; // Return -1 if no matching supplier is found
+    }
+
+
+
 
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
@@ -320,5 +426,8 @@ public class DashBoardController {
 
         Sign_out.getScene().getWindow().hide();
     }
+
+    // method to add new drug to the database
+
 
 }
