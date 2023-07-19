@@ -193,6 +193,11 @@ public class DashBoardController {
     @FXML
     private Button closeBtn;
 
+    //Database credentials
+    String url = "jdbc:mysql://localhost:3306/pharmacy";
+    String username = "root";
+    String password = "PASSWORD";
+    Connection connection;
 
 
     @FXML
@@ -217,68 +222,70 @@ public class DashBoardController {
 
 
     @FXML
-    private void handleAddButtonAction() {
-        // Retrieve values from text fields and spinner
-        String supplierName = New_supplierName.getText();
-        double price = Double.parseDouble(New_price.getText());
-        String drugName = New_drugName.getText();
-        int quantity = New_spinner.getValue(); // Not sure about spinner
-        int supplierID = findSupplierKeyByName(supplierName);
+    private void handleAddButtonAction(ActionEvent event) {
+        if(event.getSource() == New_add) {
+            // Retrieve values from text fields and spinner
+            String supplierName = New_supplierName.getText();
+            double price = Double.parseDouble(New_price.getText());
+            String drugName = New_drugName.getText();
+            int quantity = New_spinner.getValue(); // Not sure about spinner
+            int supplierID = findSupplierKeyByName(supplierName);
 
 
-        // Create a new drug object
-        Drug newDrug = new Drug(drugName, supplierName, price, quantity);
+            // Create a new drug object
+            Drug newDrug = new Drug(drugName, supplierName, price, quantity);
 
-        // Add drug object to the hash table
-        drugHashTable.put(newDrug.getId(), newDrug);
+            // Add drug object to the hash table
+            drugHashTable.put(newDrug.getId(), newDrug);
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Drugs Added");
-        alert.setHeaderText(null);
-        alert.setContentText("Drugs added successfully!");
-        alert.showAndWait();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Drugs Added");
+            alert.setHeaderText(null);
+            alert.setContentText("Drugs added successfully!");
+            alert.showAndWait();
 
-        // Clear text fields and spinner value
-        New_supplierName.clear();
-        New_price.clear();
-        New_drugName.clear();
-        New_spinner.getValueFactory().setValue(null);
+            // Clear text fields and spinner value
+            New_supplierName.clear();
+            New_price.clear();
+            New_drugName.clear();
+            New_spinner.getValueFactory().setValue(null);
 
-        // inserting into drugs table
-        String insertQuery = "INSERT INTO drugs (drug_id, drug_name, supplier_id, unit_price, quantity) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement preparedStatement = null;
-        try{
-            // Prepare the statement
-            preparedStatement = connection.prepareStatement(insertQuery);
-            preparedStatement.setInt(1, newDrug.getId());
-            preparedStatement.setString(2, drugName);
-            preparedStatement.setInt(3, supplierID); //  About to implement suppliers  hash table
-            preparedStatement.setDouble(4, price);
-            preparedStatement.setInt(5, quantity);
-            // Execute the statement
-            preparedStatement.executeUpdate();
-            System.out.println("Data inserted successfully!");
+            // inserting into drugs table
+            String insertQuery = "INSERT INTO drugs (drug_id, drug_name, supplier_id, unit_price, quantity) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = null;
+            try{
+                // Prepare the statement
+                preparedStatement = connection.prepareStatement(insertQuery);
+                preparedStatement.setInt(1, newDrug.getId());
+                preparedStatement.setString(2, drugName);
+                preparedStatement.setInt(3, supplierID); //  About to implement suppliers  hash table
+                preparedStatement.setDouble(4, price);
+                preparedStatement.setInt(5, quantity);
+                // Execute the statement
+                preparedStatement.executeUpdate();
+                System.out.println("Data inserted successfully!");
 
-        }
-        catch (SQLException e) {
-            System.err.println("Error occurred while inserting data into the database: " + e.getMessage());
-        }
-        finally {
-            // Close the prepared statement
-            if (preparedStatement != null) {
-                try {
-                    preparedStatement.close();
-                } catch (SQLException e) {
-                    System.err.println("Error occurred while closing prepared statement: " + e.getMessage());
-                }
             }
+            catch (SQLException e) {
+                System.err.println("Error occurred while inserting data into the database: " + e.getMessage());
+            }
+            finally {
+                // Close the prepared statement
+                if (preparedStatement != null) {
+                    try {
+                        preparedStatement.close();
+                    } catch (SQLException e) {
+                        System.err.println("Error occurred while closing prepared statement: " + e.getMessage());
+                    }
+                }
 
-            // Close the database connection
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    System.err.println("Error occurred while closing database connection: " + e.getMessage());
+                // Close the database connection
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        System.err.println("Error occurred while closing database connection: " + e.getMessage());
+                    }
                 }
             }
         }
@@ -294,15 +301,6 @@ public class DashBoardController {
         }
         return -1; // Return -1 if no matching supplier is found
     }
-
-
-
-
-    //Database credentials
-    String url = "jdbc:mysql://localhost:3306/pharmacy";
-    String username = "root";
-    String password = "PASSWORD";
-    Connection connection;
 
 
     //Method to connect to Database
