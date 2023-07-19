@@ -1,31 +1,37 @@
 package com.example.javanuggets;
 
 public class DrugsData {
-    private Integer supplierId;
+    private int drugID;
     private String  drugName;
-    private Double  price;
-    private Integer quantity;
+    private int supplierId;
+    private Double  unitPrice;
+    private int quantity;
 
-    public DrugsData(Integer supplierId, String drugName, Double price, Integer quantity) {
+    public DrugsData(int drugID, String drugName, int supplierId, Double unitPrice, int quantity) {
+        this.drugID = drugID;
         this.supplierId = supplierId;
         this.drugName = drugName;
-        this.price = price;
+        this.unitPrice = unitPrice;
         this.quantity = quantity;
     }
 
-    public Integer getSupplierId() {
-        return supplierId;
+    public int getDrugID() {
+        return this.drugID;
+    }
+
+    public int getSupplierId() {
+        return this.supplierId;
     }
 
     public String getDrugName() {
-        return drugName;
+        return this.drugName;
     }
 
-    public Double getPrice() {
-        return price;
+    public Double getUnitPrice() {
+        return this.unitPrice;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    public int getQuantity() {
+        return this.quantity;
     }
 }

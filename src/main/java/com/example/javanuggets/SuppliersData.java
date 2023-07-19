@@ -2,13 +2,13 @@ package com.example.javanuggets;
 
 public class SuppliersData {
 
-    private Integer supplierId;
+    private int supplierId;
     private String supplierName;
     private String supplierContact;
     private String supplierEmail;
     private String supplierLocation;
 
-    public SuppliersData(Integer supplierId, String supplierName, String supplierContact, String supplierEmail, String supplierLocation) {
+    public SuppliersData(int supplierId, String supplierName, String supplierContact, String supplierEmail, String supplierLocation) {
         this.supplierId = supplierId;
         this.supplierName = supplierName;
         this.supplierContact = supplierContact;

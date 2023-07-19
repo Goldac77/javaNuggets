@@ -11,14 +11,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DashBoardController {
 
@@ -206,7 +205,7 @@ public class DashBoardController {
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
-    String password = "password";
+    String password = "ezioauditore@77";
     Connection connection;
     private PreparedStatement prepare;
     private ResultSet result;
@@ -225,7 +224,7 @@ public class DashBoardController {
     @FXML
     private HashMap<Integer, Supplier> supplierHashMap;
 
-    public DashBoardController() {
+    public DashBoardController() throws SQLException {
         drugHashTable = new HashMap<>();
         // Spinner<?> newSpinner = new Spinner<>();
         supplierHashMap = new HashMap<>();
@@ -234,7 +233,7 @@ public class DashBoardController {
 
 
     @FXML
-    private void handleAddDrugButtonAction(ActionEvent event) {
+    private void handleAddDrugButtonAction(ActionEvent event) throws SQLException {
         if(event.getSource() == New_add) {
             // Retrieve values from text fields and spinner
             String supplierName = New_supplierName.getText();
@@ -250,17 +249,13 @@ public class DashBoardController {
             // Add drug object to the hash table
             drugHashTable.put(newDrug.getId(), newDrug);
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Drugs Added");
-            alert.setHeaderText(null);
-            alert.setContentText("Drugs added successfully!");
-            alert.showAndWait();
-
             // Clear text fields and spinner value
             New_supplierName.clear();
             New_price.clear();
             New_drugName.clear();
             New_spinner.getValueFactory().setValue(null);
+
+            connectToDatabase(url, username, password);
 
             // inserting into drugs table
             String insertQuery = "INSERT INTO drugs (drug_id, drug_name, supplier_id, unit_price, quantity) VALUES (?, ?, ?, ?, ?)";
@@ -276,6 +271,12 @@ public class DashBoardController {
                 // Execute the statement
                 preparedStatement.executeUpdate();
                 System.out.println("Data inserted successfully!");
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Drugs Added");
+                alert.setHeaderText(null);
+                alert.setContentText("Drugs added successfully!");
+                alert.showAndWait();
 
             }
             catch (SQLException e) {
@@ -326,7 +327,7 @@ public class DashBoardController {
     }
 
     public void handleAddSupplierButtonAction(ActionEvent event) {
-        if(event.getSource() == addSupplier_btn) {
+        if (event.getSource() == addSupplier_btn) {
             String supplierName = AddSupplierName.getText();
             String supplierEmail = AddSupplierEmail.getText();
             String supplierContact = AddSupplierContact.getText();
@@ -335,14 +336,8 @@ public class DashBoardController {
             Supplier newSupplier = new Supplier(supplierName, supplierContact, supplierLocation, supplierEmail);
             int supplierID = newSupplier.getId();
 
-            //Add supplier to the supplier hashmap
+            // Add supplier to the supplier hashmap
             supplierHashMap.put(supplierID, newSupplier);
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Supplier Added");
-            alert.setHeaderText(null);
-            alert.setContentText("Supplier added successfully!");
-            alert.showAndWait();
 
             // Clear text fields and spinner value
             AddSupplierName.clear();
@@ -350,46 +345,40 @@ public class DashBoardController {
             AddSupplierContact.clear();
             AddSupplierLocation.clear();
 
-            // inserting into drugs table
-            String insertQuery = "INSERT INTO suppliers (supplier_id, supplier_name, contact_number, email, location) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement preparedStatement = null;
-            try{
-                // Prepare the statement
-                preparedStatement = connection.prepareStatement(insertQuery);
-                preparedStatement.setInt(1, supplierID);
-                preparedStatement.setString(2, supplierName);
-                preparedStatement.setString(3, supplierContact);
-                preparedStatement.setString(4, supplierEmail);
-                preparedStatement.setString(5, supplierLocation);
-                // Execute the statement
-                preparedStatement.executeUpdate();
-                System.out.println("Data inserted successfully!");
-
-            }
-            catch (SQLException e) {
-                System.err.println("Error occurred while inserting data into the database: " + e.getMessage());
-            }
-            finally {
-                // Close the prepared statement
-                if (preparedStatement != null) {
-                    try {
-                        preparedStatement.close();
-                    } catch (SQLException e) {
-                        System.err.println("Error occurred while closing prepared statement: " + e.getMessage());
-                    }
-                }
-
-                // Close the database connection
+            try {
+                connectToDatabase(url, username, password);
                 if (connection != null) {
-                    try {
+                    String insertQuery = "INSERT INTO suppliers (supplier_id, supplier_name, contact_number, email, location) VALUES (?, ?, ?, ?, ?)";
+                    PreparedStatement stmt = connection.prepareStatement(insertQuery);
+                    stmt.setInt(1, supplierID);
+                    stmt.setString(2, supplierName);
+                    stmt.setString(3, supplierContact);
+                    stmt.setString(4, supplierEmail);
+                    stmt.setString(5, supplierLocation);
+                    stmt.executeUpdate();
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                // Handle SQLException here (e.g., display error message or log the exception)
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (connection != null) {
                         connection.close();
-                    } catch (SQLException e) {
-                        System.err.println("Error occurred while closing database connection: " + e.getMessage());
                     }
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Supplier Added");
+            alert.setHeaderText(null);
+            alert.setContentText("Supplier added successfully!");
+            alert.showAndWait();
         }
     }
+
 
 
     public ObservableList<DrugsData> addDrugsListData() throws SQLException {
@@ -406,10 +395,12 @@ public class DashBoardController {
 
             while(result.next()){
                 drug = new DrugsData(
-                          result.getInt("drug_id")
-                        , result.getString("drug_name")
-                        , result.getDouble("drug_price")
-                        , result.getInt("drug_quantity"));
+                        result.getInt("drug_id"),
+                        result.getString("drug_name"),
+                        result.getInt("supplier_id"),
+                        result.getDouble("unit_price"),
+                        result.getInt("quantity")
+                );
 
                 DrugsList.add(drug);
 
@@ -425,11 +416,9 @@ public class DashBoardController {
     public void addDrugsShowListData() throws SQLException {
         addDrugsList = addDrugsListData();
 
-
-
         Drugs_tableView_col_supplierID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
         Drugs_tableView_col_drugName.setCellValueFactory(new PropertyValueFactory<>("drugName"));
-        Drugs_tableView_col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
+        Drugs_tableView_col_price.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
         Drugs_tableView_col_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
         Drugs_tableView.setItems(addDrugsList);
@@ -450,9 +439,9 @@ public class DashBoardController {
             while(result.next()){
                 supplier = new SuppliersData(result.getInt("supplier_id")
                         , result.getString("supplier_name")
-                        , result.getString("supplier_contact")
-                        , result.getString("supplier_email")
-                        , result.getString("supplier_location"));
+                        , result.getString("contact_number")
+                        , result.getString("email")
+                        , result.getString("location"));
 
                 SuppliersList.add(supplier);
 
@@ -468,7 +457,7 @@ public class DashBoardController {
     public void addSuppliersShowListData() throws SQLException {
         addSuppliersList = addSuppliersListData();
 
-        Suppler_tableView_col_supplierID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
+        Suppler_tableView_col_supplierID.setCellValueFactory(new PropertyValueFactory<>("SupplierId"));
         Suppler_tableView_col_supplierName.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
         Suppler_tableView_col_supplierContact.setCellValueFactory(new PropertyValueFactory<>("supplierContact"));
         Suppler_tableView_col_email.setCellValueFactory(new PropertyValueFactory<>("supplierEmail"));
