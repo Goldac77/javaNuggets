@@ -1,7 +1,9 @@
-package com.example.javanuggets
+package com.example.javanuggets;
 import java.sql.PreparedStatement;
 import java.util.HashMap;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
