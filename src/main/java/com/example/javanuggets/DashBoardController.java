@@ -1,21 +1,22 @@
-package com.example.javanuggets;
-
+package com.example.javanuggets
 import java.sql.PreparedStatement;
 import java.util.HashMap;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DashBoardController {
 
@@ -77,19 +78,20 @@ public class DashBoardController {
     private Button Drugs_tab;
 
     @FXML
-    private TableView<?> Drugs_tableView;
+    private TableView<DrugsData> Drugs_tableView;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_drugName;
+    private TableColumn<DrugsData, String> Drugs_tableView_col_drugName;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_price;
+
+    private TableColumn<DrugsData, Double> Drugs_tableView_col_price;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_quantity;
+    private TableColumn<DrugsData, Integer> Drugs_tableView_col_quantity;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_supplierID;
+    private TableColumn<DrugsData, Integer> Drugs_tableView_col_supplierID;
 
     @FXML
     private Button Drugs_update;
@@ -137,22 +139,22 @@ public class DashBoardController {
     private Button Sign_out;
 
     @FXML
-    private TableView<?> Suppler_tableView;
+    private TableView<SuppliersData> Suppler_tableView;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_email;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_email;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_location;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_location;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_supplierContact;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_supplierContact;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_supplierID;
+    private TableColumn<SuppliersData, Integer> Suppler_tableView_col_supplierID;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_supplierName;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_supplierName;
 
     @FXML
     private AnchorPane Supplier_form;
@@ -202,8 +204,10 @@ public class DashBoardController {
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
-    String password = "PASSWORD";
+    String password = "password";
     Connection connection;
+    private PreparedStatement prepare;
+    private ResultSet result;
 
 
     @FXML
@@ -386,8 +390,93 @@ public class DashBoardController {
     }
 
 
+    public ObservableList<DrugsData> addDrugsListData() throws SQLException {
+
+        ObservableList<DrugsData> DrugsList = FXCollections.observableArrayList();
+
+        String sql = "SELECT * from drugs";
+        connectToDatabase(url, username, password);
+
+        try{
+            prepare = connection.prepareStatement(sql);
+            result = prepare.executeQuery();
+            DrugsData drug;
+
+            while(result.next()){
+                drug = new DrugsData(
+                          result.getInt("drug_id")
+                        , result.getString("drug_name")
+                        , result.getDouble("drug_price")
+                        , result.getInt("drug_quantity"));
+
+                DrugsList.add(drug);
+
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return DrugsList;
+    }
+
+    private ObservableList<DrugsData> addDrugsList;
+    public void addDrugsShowListData() throws SQLException {
+        addDrugsList = addDrugsListData();
+
+
+
+        Drugs_tableView_col_supplierID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
+        Drugs_tableView_col_drugName.setCellValueFactory(new PropertyValueFactory<>("drugName"));
+        Drugs_tableView_col_price.setCellValueFactory(new PropertyValueFactory<>("price"));
+        Drugs_tableView_col_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        Drugs_tableView.setItems(addDrugsList);
+    }
+
+    public ObservableList<SuppliersData> addSuppliersListData() throws SQLException {
+
+        ObservableList<SuppliersData> SuppliersList = FXCollections.observableArrayList();
+
+        String sql = "SELECT * from suppliers";
+        connectToDatabase(url, username, password);
+
+        try{
+            prepare = connection.prepareStatement(sql);
+            result = prepare.executeQuery();
+            SuppliersData supplier;
+
+            while(result.next()){
+                supplier = new SuppliersData(result.getInt("supplier_id")
+                        , result.getString("supplier_name")
+                        , result.getString("supplier_contact")
+                        , result.getString("supplier_email")
+                        , result.getString("supplier_location"));
+
+                SuppliersList.add(supplier);
+
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return SuppliersList;
+    }
+
+    private ObservableList<SuppliersData> addSuppliersList;
+    public void addSuppliersShowListData() throws SQLException {
+        addSuppliersList = addSuppliersListData();
+
+        Suppler_tableView_col_supplierID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
+        Suppler_tableView_col_supplierName.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
+        Suppler_tableView_col_supplierContact.setCellValueFactory(new PropertyValueFactory<>("supplierContact"));
+        Suppler_tableView_col_email.setCellValueFactory(new PropertyValueFactory<>("supplierEmail"));
+        Suppler_tableView_col_location.setCellValueFactory(new PropertyValueFactory<>("supplierLocation"));
+        Suppler_tableView.setItems(addSuppliersList);
+    }
+
+
     //switching between screens
-    public void switchForms(ActionEvent event){
+    public void switchForms(ActionEvent event) throws SQLException {
         if(event.getSource() == Drugs_tab) {
             Drugs_form.setVisible(true);
             New_form.setVisible(false);
@@ -400,6 +489,9 @@ public class DashBoardController {
             Drugs_tab.setStyle("-fx-background-color: linear-gradient(to bottom right, #19b999,#09948d);");
             Purchase_tab.setStyle("-fx-background: transparent");
             Supplier_tab.setStyle("-fx-background: transparent");
+
+            addDrugsShowListData();
+
         } else if (event.getSource()== Purchase_tab) {
             Drugs_form.setVisible(false);
             New_form.setVisible(false);
@@ -426,6 +518,8 @@ public class DashBoardController {
             Supplier_tab.setStyle("-fx-background-color: linear-gradient(to bottom right, #19b999,#09948d);");
             Drugs_tab.setStyle("-fx-background: transparent");
             Purchase_tab.setStyle("-fx-background: transparent");
+
+            addSuppliersShowListData();
         }
     }
 
