@@ -4,15 +4,13 @@ import java.util.Date;
 
 public class Purchase {
     private static int count = 1;
-    private String purchaseID;
-    private String drugID;
-    private String buyerID;
+    private Integer drugID;
+    private Integer buyerID;
     private Date purchaseDate;
     private int quantity;
     private int id;
 
-    public Purchase(String purchaseID, String drugID, String buyerID, Date purchaseDate, int quantity) {
-        this.purchaseID = purchaseID;
+    public Purchase( Integer drugID, Integer buyerID, Date purchaseDate, int quantity) {
         this.drugID = drugID;
         this.buyerID = buyerID;
         this.purchaseDate = purchaseDate;
@@ -25,27 +23,20 @@ public class Purchase {
     public int getId() {
         return this.id;
     }
-    public String getPurchaseID() {
-        return purchaseID;
-    }
 
-    public void setPurchaseID(String purchaseID) {
-        this.purchaseID = purchaseID;
-    }
-
-    public String getDrugID() {
+    public Integer getDrugID() {
         return drugID;
     }
 
-    public void setDrugID(String drugID) {
+    public void setDrugID(Integer drugID) {
         this.drugID = drugID;
     }
 
-    public String getBuyerID() {
+    public Integer getBuyerID() {
         return buyerID;
     }
 
-    public void setBuyerID(String buyerID) {
+    public void setBuyerID(Integer buyerID) {
         this.buyerID = buyerID;
     }
 
