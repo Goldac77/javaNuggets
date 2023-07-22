@@ -1,21 +1,23 @@
 package com.example.javanuggets;
-
 import java.sql.PreparedStatement;
 import java.util.HashMap;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class DashBoardController {
 
@@ -77,19 +79,20 @@ public class DashBoardController {
     private Button Drugs_tab;
 
     @FXML
-    private TableView<?> Drugs_tableView;
+    private TableView<DrugsData> Drugs_tableView;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_drugName;
+    private TableColumn<DrugsData, String> Drugs_tableView_col_drugName;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_price;
+
+    private TableColumn<DrugsData, Double> Drugs_tableView_col_price;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_quantity;
+    private TableColumn<DrugsData, Integer> Drugs_tableView_col_quantity;
 
     @FXML
-    private TableColumn<?, ?> Drugs_tableView_col_supplierID;
+    private TableColumn<DrugsData, Integer> Drugs_tableView_col_supplierID;
 
     @FXML
     private Button Drugs_update;
@@ -137,22 +140,22 @@ public class DashBoardController {
     private Button Sign_out;
 
     @FXML
-    private TableView<?> Suppler_tableView;
+    private TableView<SuppliersData> Suppler_tableView;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_email;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_email;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_location;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_location;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_supplierContact;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_supplierContact;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_supplierID;
+    private TableColumn<SuppliersData, Integer> Suppler_tableView_col_supplierID;
 
     @FXML
-    private TableColumn<?, ?> Suppler_tableView_col_supplierName;
+    private TableColumn<SuppliersData, String> Suppler_tableView_col_supplierName;
 
     @FXML
     private AnchorPane Supplier_form;
@@ -193,11 +196,19 @@ public class DashBoardController {
     @FXML
     private Button closeBtn;
 
+    public TextField AddSupplierName;
+    public TextField AddSupplierEmail;
+    public TextField AddSupplierContact;
+    public TextField AddSupplierLocation;
+    public Button addSupplier_btn;
+
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
-    String password = "PASSWORD";
+    String password = "ezioauditore@77";
     Connection connection;
+    private PreparedStatement prepare;
+    private ResultSet result;
 
 
     @FXML
@@ -213,7 +224,7 @@ public class DashBoardController {
     @FXML
     private HashMap<Integer, Supplier> supplierHashMap;
 
-    public DashBoardController() {
+    public DashBoardController() throws SQLException {
         drugHashTable = new HashMap<>();
         // Spinner<?> newSpinner = new Spinner<>();
         supplierHashMap = new HashMap<>();
@@ -222,7 +233,7 @@ public class DashBoardController {
 
 
     @FXML
-    private void handleAddButtonAction(ActionEvent event) {
+    private void handleAddDrugButtonAction(ActionEvent event) throws SQLException {
         if(event.getSource() == New_add) {
             // Retrieve values from text fields and spinner
             String supplierName = New_supplierName.getText();
@@ -238,17 +249,13 @@ public class DashBoardController {
             // Add drug object to the hash table
             drugHashTable.put(newDrug.getId(), newDrug);
 
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Drugs Added");
-            alert.setHeaderText(null);
-            alert.setContentText("Drugs added successfully!");
-            alert.showAndWait();
-
             // Clear text fields and spinner value
             New_supplierName.clear();
             New_price.clear();
             New_drugName.clear();
             New_spinner.getValueFactory().setValue(null);
+
+            connectToDatabase(url, username, password);
 
             // inserting into drugs table
             String insertQuery = "INSERT INTO drugs (drug_id, drug_name, supplier_id, unit_price, quantity) VALUES (?, ?, ?, ?, ?)";
@@ -264,6 +271,12 @@ public class DashBoardController {
                 // Execute the statement
                 preparedStatement.executeUpdate();
                 System.out.println("Data inserted successfully!");
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Drugs Added");
+                alert.setHeaderText(null);
+                alert.setContentText("Drugs added successfully!");
+                alert.showAndWait();
 
             }
             catch (SQLException e) {
@@ -313,9 +326,148 @@ public class DashBoardController {
         }
     }
 
+    public void handleAddSupplierButtonAction(ActionEvent event) {
+        if (event.getSource() == addSupplier_btn) {
+            String supplierName = AddSupplierName.getText();
+            String supplierEmail = AddSupplierEmail.getText();
+            String supplierContact = AddSupplierContact.getText();
+            String supplierLocation = AddSupplierLocation.getText();
+
+            Supplier newSupplier = new Supplier(supplierName, supplierContact, supplierLocation, supplierEmail);
+            int supplierID = newSupplier.getId();
+
+            // Add supplier to the supplier hashmap
+            supplierHashMap.put(supplierID, newSupplier);
+
+            // Clear text fields and spinner value
+            AddSupplierName.clear();
+            AddSupplierEmail.clear();
+            AddSupplierContact.clear();
+            AddSupplierLocation.clear();
+
+            try {
+                connectToDatabase(url, username, password);
+                if (connection != null) {
+                    String insertQuery = "INSERT INTO suppliers (supplier_id, supplier_name, contact_number, email, location) VALUES (?, ?, ?, ?, ?)";
+                    PreparedStatement stmt = connection.prepareStatement(insertQuery);
+                    stmt.setInt(1, supplierID);
+                    stmt.setString(2, supplierName);
+                    stmt.setString(3, supplierContact);
+                    stmt.setString(4, supplierEmail);
+                    stmt.setString(5, supplierLocation);
+                    stmt.executeUpdate();
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+                // Handle SQLException here (e.g., display error message or log the exception)
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Supplier Added");
+            alert.setHeaderText(null);
+            alert.setContentText("Supplier added successfully!");
+            alert.showAndWait();
+        }
+    }
+
+
+
+    public ObservableList<DrugsData> addDrugsListData() throws SQLException {
+
+        ObservableList<DrugsData> DrugsList = FXCollections.observableArrayList();
+
+        String sql = "SELECT * from drugs";
+        connectToDatabase(url, username, password);
+
+        try{
+            prepare = connection.prepareStatement(sql);
+            result = prepare.executeQuery();
+            DrugsData drug;
+
+            while(result.next()){
+                drug = new DrugsData(
+                        result.getInt("drug_id"),
+                        result.getString("drug_name"),
+                        result.getInt("supplier_id"),
+                        result.getDouble("unit_price"),
+                        result.getInt("quantity")
+                );
+
+                DrugsList.add(drug);
+
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return DrugsList;
+    }
+
+    private ObservableList<DrugsData> addDrugsList;
+    public void addDrugsShowListData() throws SQLException {
+        addDrugsList = addDrugsListData();
+
+        Drugs_tableView_col_supplierID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
+        Drugs_tableView_col_drugName.setCellValueFactory(new PropertyValueFactory<>("drugName"));
+        Drugs_tableView_col_price.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+        Drugs_tableView_col_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        Drugs_tableView.setItems(addDrugsList);
+    }
+
+    public ObservableList<SuppliersData> addSuppliersListData() throws SQLException {
+
+        ObservableList<SuppliersData> SuppliersList = FXCollections.observableArrayList();
+
+        String sql = "SELECT * from suppliers";
+        connectToDatabase(url, username, password);
+
+        try{
+            prepare = connection.prepareStatement(sql);
+            result = prepare.executeQuery();
+            SuppliersData supplier;
+
+            while(result.next()){
+                supplier = new SuppliersData(result.getInt("supplier_id")
+                        , result.getString("supplier_name")
+                        , result.getString("contact_number")
+                        , result.getString("email")
+                        , result.getString("location"));
+
+                SuppliersList.add(supplier);
+
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return SuppliersList;
+    }
+
+    private ObservableList<SuppliersData> addSuppliersList;
+    public void addSuppliersShowListData() throws SQLException {
+        addSuppliersList = addSuppliersListData();
+
+        Suppler_tableView_col_supplierID.setCellValueFactory(new PropertyValueFactory<>("SupplierId"));
+        Suppler_tableView_col_supplierName.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
+        Suppler_tableView_col_supplierContact.setCellValueFactory(new PropertyValueFactory<>("supplierContact"));
+        Suppler_tableView_col_email.setCellValueFactory(new PropertyValueFactory<>("supplierEmail"));
+        Suppler_tableView_col_location.setCellValueFactory(new PropertyValueFactory<>("supplierLocation"));
+        Suppler_tableView.setItems(addSuppliersList);
+    }
+
 
     //switching between screens
-    public void switchForms(ActionEvent event){
+    public void switchForms(ActionEvent event) throws SQLException {
         if(event.getSource() == Drugs_tab) {
             Drugs_form.setVisible(true);
             New_form.setVisible(false);
@@ -328,6 +480,9 @@ public class DashBoardController {
             Drugs_tab.setStyle("-fx-background-color: linear-gradient(to bottom right, #19b999,#09948d);");
             Purchase_tab.setStyle("-fx-background: transparent");
             Supplier_tab.setStyle("-fx-background: transparent");
+
+            addDrugsShowListData();
+
         } else if (event.getSource()== Purchase_tab) {
             Drugs_form.setVisible(false);
             New_form.setVisible(false);
@@ -354,6 +509,8 @@ public class DashBoardController {
             Supplier_tab.setStyle("-fx-background-color: linear-gradient(to bottom right, #19b999,#09948d);");
             Drugs_tab.setStyle("-fx-background: transparent");
             Purchase_tab.setStyle("-fx-background: transparent");
+
+            addSuppliersShowListData();
         }
     }
 

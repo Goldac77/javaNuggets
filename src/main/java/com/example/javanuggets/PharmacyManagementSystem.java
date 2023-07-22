@@ -100,7 +100,6 @@ public class PharmacyManagementSystem {
         }
     }
 
-    // Bonus method, i wanted to make sure the delete method actually removed the drug
     public void listDrugs() {
         System.out.println("Drug list");
         for (Map.Entry<Integer, Drug> entry : drugs.entrySet()) {
@@ -108,28 +107,6 @@ public class PharmacyManagementSystem {
             System.out.println(drug.getDrugName() + ", " + drug.getSupplierName() + ", " + drug.getUnitPrice() + ", " + drug.getQuantity());
         }
     }
-/**
-    // I'm leaving this here so u can test it urself Nick!!! stare......
-    // U see my face...
-
-    public static void main(String[] args) {
-
-        PharmacyManagementSystem ps = new PharmacyManagementSystem();
-
-        Drug drug1 = new Drug("Drug1", "Supplier1", 10.0, 100);
-        Drug drug2 = new Drug("Drug2", "Supplier2", 20.0, 200);
-        Drug drug3 = new Drug("Drug3", "Supplier3", 30.0, 300);
-
-        ps.addDrug(drug1);
-        ps.addDrug(drug2);
-        ps.addDrug(drug3);
-
-        ps.searchDrug("Drug2");
-        ps.editDrug("Drug3", "sup", 233, 20);
-        ps.deleteDrug("Drug2");
-        ps.listDrugs();
-    } **/
-
     // Database connection setup
     public void connectToDatabase(String url, String username, String password) throws SQLException {
         try {
