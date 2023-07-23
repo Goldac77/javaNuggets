@@ -1,6 +1,6 @@
 package com.example.javanuggets;
 import java.sql.PreparedStatement;
-import java.util.HashMap;
+import java.util.*;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +19,7 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.sql.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -220,21 +221,118 @@ public class DashBoardController {
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0);
         New_spinner.setValueFactory(valueFactory);
     }
-
+    @FXML
+    private HashMap<Integer, Buyer> buyerHashTable;
     @FXML
     private HashMap<Integer, Drug> drugHashTable;
 
     @FXML
     private HashMap<Integer, Supplier> supplierHashMap;
+    List<Purchase> purchaseList;
 
     public DashBoardController() throws SQLException {
         drugHashTable = new HashMap<>();
         // Spinner<?> newSpinner = new Spinner<>();
         supplierHashMap = new HashMap<>();
+        buyerHashTable = new HashMap<>();
+        purchaseList = new ArrayList<>();
 
     }
 
+    @FXML
+    public void buyDrugs(ActionEvent event) throws SQLException {
+        if (event.getSource() == AddPurchase_buy) {
 
+            connectToDatabase(url, username, password);
+
+            String buyerName = AddPurchase_buyerName.getText();
+            String buyerContact = AddPurchase_buyerContact.getText();
+            String drugName = AddPurchase_drugName.getText();
+            Double price = Double.parseDouble(AddPurchase_price.getText());
+            Integer quantity = Integer.parseInt(AddPurchase_quantity.getText());
+
+            AddPurchase_buyerName.clear();
+            AddPurchase_buyerContact.clear();
+            AddPurchase_drugName.clear();
+            AddPurchase_price.clear();
+            AddPurchase_quantity.clear();
+
+
+            Buyer newBuyer = new Buyer(buyerName, buyerContact);
+
+            buyerHashTable.put(newBuyer.getId(), newBuyer);
+
+            // inserting into buyers table in database
+            String sql = "INSERT INTO buyers (buyer_id, buyer_name, buyer_number) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = null;
+            try {
+                // Prepare the statement
+                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setInt(1, newBuyer.getId());
+                preparedStatement.setString(2, buyerName);
+                preparedStatement.setString(3, buyerContact);
+
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Get drug Id from map
+            Integer drugID = null;
+            for (Map.Entry<Integer, Drug> entry : drugHashTable.entrySet()) {
+                Drug drug = entry.getValue();
+                if (drug.getDrugName().equals(drugName)) {
+                    drugID = entry.getKey();
+                }
+            }
+
+            // Create purchase object
+            Date purchaseDate = new Date();
+            Integer buyerID = newBuyer.getId();
+
+            Purchase newPurchase = new Purchase(drugID, buyerID, purchaseDate, quantity);
+            Integer purchaseID = newPurchase.getId();
+
+            // Add purchase object into an arraylist
+
+            purchaseList.add(newPurchase);
+
+            // inserting into purchase table in database
+            String purchaseSql = "INSERT INTO purchases (purchase_id, drug_id, buyer_id, purchase_date, quantity) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement stmt = null;
+            try {
+                // Prepare the statement
+                stmt = connection.prepareStatement(purchaseSql);
+                stmt.setInt(1, purchaseID);
+                stmt.setInt(2, drugID);
+                stmt.setInt(3, buyerID);
+                stmt.setDate(4, (java.sql.Date) purchaseDate);
+                stmt.setInt(5, quantity);
+
+                stmt.executeUpdate();
+                stmt.close();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Drugs Bought");
+            alert.setHeaderText(null);
+            alert.setContentText("Transaction Completed \n Total amount is " + quantity*price);
+            alert.showAndWait();
+
+        }
+        connection.close();
+    }
+
+
+
+    // method to add new drug to the database
     @FXML
     private void handleAddDrugButtonAction(ActionEvent event) throws SQLException {
         if(event.getSource() == New_add) {
@@ -568,6 +666,7 @@ public class DashBoardController {
         }
     }
 
+
     public void addPurchaseCancel(ActionEvent event){
         Drugs_form.setVisible(false);
         New_form.setVisible(false);
@@ -641,7 +740,6 @@ public class DashBoardController {
             alert.showAndWait();
         }
     }
-
 
 
 }
