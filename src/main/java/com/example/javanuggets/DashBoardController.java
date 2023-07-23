@@ -228,14 +228,14 @@ public class DashBoardController {
 
     @FXML
     private HashMap<Integer, Supplier> supplierHashMap;
-    List<Purchase> purchaseList;
+    List<Purchase> purchaseHistory;
 
     public DashBoardController() throws SQLException {
         drugHashTable = new HashMap<>();
         // Spinner<?> newSpinner = new Spinner<>();
         supplierHashMap = new HashMap<>();
         buyerHashTable = new HashMap<>();
-        purchaseList = new ArrayList<>();
+        purchaseHistory = new ArrayList<>();
 
     }
 
@@ -298,7 +298,7 @@ public class DashBoardController {
 
             // Add purchase object into an arraylist
 
-            purchaseList.add(newPurchase);
+            purchaseHistory.add(newPurchase);
 
             // inserting into purchase table in database
             String purchaseSql = "INSERT INTO purchases (purchase_id, drug_id, buyer_id, purchase_date, quantity) VALUES (?, ?, ?, ?, ?)";
@@ -720,24 +720,25 @@ public class DashBoardController {
     }
 
     // Add functionality to the receipt button
-    List<Purchase> purchaseHistory = new ArrayList<>();
     public void Purchases_receipt(ActionEvent event)
     {
-        if(purchaseHistory.size() > 0) {
-            Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Last Purchase");
-            alert.setHeaderText("Details of the last purchase");
-            alert.setContentText(lastPurchase.toString());
+        if(event.getSource() == Purchases_receipt) {
+            if(purchaseHistory.size() > 0) {
+                Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Last Purchase");
+                alert.setHeaderText("Details of the last purchase");
+                alert.setContentText(lastPurchase.toString());
 
-            alert.showAndWait();
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("No purchases found");
-            alert.setContentText("There are no purchases in the history.");
+                alert.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("No purchases found");
+                alert.setContentText("There are no purchases in the history.");
 
-            alert.showAndWait();
+                alert.showAndWait();
+            }
         }
     }
 

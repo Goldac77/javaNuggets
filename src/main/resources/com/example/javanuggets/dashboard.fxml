@@ -204,7 +204,7 @@
                         <Button fx:id="Purchases_receipt" layoutX="87.0" layoutY="114.0" mnemonicParsing="false" styleClass="UpdateBtn" stylesheets="@../../../style.css" text="RECEIPT" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane fx:id="AddPurchase_form" layoutX="215.0" layoutY="8.0" prefHeight="440.0" prefWidth="529.0">
+                  <AnchorPane fx:id="AddPurchase_form" layoutX="215.0" layoutY="8.0" prefHeight="440.0" prefWidth="529.0" visible="false">
                      <children>
                         <AnchorPane layoutX="34.0" layoutY="78.0" prefHeight="273.0" prefWidth="461.0" styleClass="new" stylesheets="@../../../style.css">
                            <children>
