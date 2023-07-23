@@ -104,7 +104,7 @@
                               <TextField fx:id="New_price" layoutX="280.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" promptText="\$0.0" />
                               <Spinner fx:id="New_spinner" layoutX="280.0" layoutY="81.0" prefHeight="25.0" prefWidth="70.0" />
                               <Label layoutX="228.0" layoutY="85.0" text="Quantity:" />
-                              <Button fx:id="New_add" layoutX="43.0" layoutY="161.0" mnemonicParsing="false" styleClass="addBtn" stylesheets="@../../../style.css" text="ADD" />
+                              <Button fx:id="New_add" layoutX="43.0" layoutY="161.0" mnemonicParsing="false" onAction="#handleAddDrugButtonAction" styleClass="addBtn" stylesheets="@../../../style.css" text="ADD" />
                               <Button fx:id="New_cancel" layoutX="324.0" layoutY="161.0" mnemonicParsing="false" onAction="#drugsCancel" styleClass="cancelBtn" stylesheets="@../../../style.css" text="CANCEL" />
                            </children>
                            <effect>
@@ -236,10 +236,6 @@
                                     <Label layoutX="27.0" layoutY="13.0" text="Price:" />
                                     <TextField fx:id="AddPurchase_quantity" layoutX="65.0" layoutY="42.0" prefHeight="25.0" prefWidth="119.0" promptText="\$0.0" />
                                     <Label layoutX="6.0" layoutY="45.0" text="Quantity:" />
-                                    <TextField fx:id="AddPurchase_total" layoutX="65.0" layoutY="84.0" prefHeight="25.0" prefWidth="119.0" promptText="\$0.0" />
-                                    <Label layoutX="26.0" layoutY="88.0" text="Total:" />
-                                    <TextField fx:id="AddPurchase_amount" layoutX="65.0" layoutY="122.0" prefHeight="25.0" prefWidth="119.0" promptText="\$0.0" />
-                                    <Label layoutX="14.0" layoutY="126.0" text="Amount:" />
                                  </children>
                                  <effect>
                                     <DropShadow spread="0.26" />
@@ -298,18 +294,16 @@
                                     </Label>
                                  </children>
                               </AnchorPane>
-                              <Label layoutX="7.0" layoutY="91.0" text="Supplier Name:" />
-                              <TextField fx:id="Update_supplierID1" layoutX="91.0" layoutY="88.0" prefHeight="25.0" prefWidth="138.0" />
-                              <Label layoutX="25.0" layoutY="50.0" text="Supplier ID:" />
-                              <TextField fx:id="Update_drugName1" layoutX="90.0" layoutY="47.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="14.0" layoutY="48.0" text="Supplier Name:" />
+                              <TextField fx:id="AddSupplierName" layoutX="98.0" layoutY="45.0" prefHeight="25.0" prefWidth="138.0" />
                               <Label layoutX="239.0" layoutY="49.0" text="Contact:" />
-                              <TextField fx:id="Update_price1" layoutX="286.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
+                              <TextField fx:id="AddSupplierContact" layoutX="286.0" layoutY="46.0" prefHeight="25.0" prefWidth="138.0" />
                               <Button fx:id="supplier_cancel" layoutX="144.0" layoutY="162.0" mnemonicParsing="false" onAction="#cancelSupplier" styleClass="cancelBtn" stylesheets="@../../../style.css" text="CANCEL" />
-                              <Button layoutX="48.0" layoutY="162.0" mnemonicParsing="false" onAction="#Drugs_add" prefHeight="25.0" prefWidth="61.0" styleClass="addBtn" stylesheets="@../../../style.css" text="ADD" />
+                              <Button fx:id="addSupplier_btn" layoutX="48.0" layoutY="162.0" mnemonicParsing="false" onAction="#handleAddSupplierButtonAction" prefHeight="25.0" prefWidth="61.0" styleClass="addBtn" stylesheets="@../../../style.css" text="ADD" />
                               <Label layoutX="234.0" layoutY="87.0" text="Location:" />
-                              <TextField fx:id="Update_price11" layoutX="286.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
-                              <Label layoutX="250.0" layoutY="128.0" text="Email:" />
-                              <TextField fx:id="Update_price111" layoutX="286.0" layoutY="125.0" prefHeight="25.0" prefWidth="138.0" />
+                              <TextField fx:id="AddSupplierLocation" layoutX="286.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
+                              <Label layoutX="11.0" layoutY="87.0" text="Email:" />
+                              <TextField fx:id="AddSupplierEmail" layoutX="47.0" layoutY="84.0" prefHeight="25.0" prefWidth="138.0" />
                            </children>
                            <effect>
                               <DropShadow spread="0.25" />
