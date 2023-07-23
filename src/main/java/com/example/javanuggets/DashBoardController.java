@@ -220,12 +220,14 @@ public class DashBoardController {
 
     @FXML
     private HashMap<Integer, Supplier> supplierHashMap;
+    List<Purchase> purchaseList;
 
     public DashBoardController() {
         drugHashTable = new HashMap<>();
         // Spinner<?> newSpinner = new Spinner<>();
         supplierHashMap = new HashMap<>();
         buyerHashTable = new HashMap<>();
+        purchaseList = new ArrayList<>();
 
     }
 
@@ -287,11 +289,11 @@ public class DashBoardController {
             Integer purchaseID = newPurchase.getId();
 
             // Add purchase object into an arraylist
-            List<Purchase> purchaseList = new ArrayList<>();
+
             purchaseList.add(newPurchase);
 
             // inserting into purchase table in database
-            String purchaseSql = "INSERT INTO buyers (purchase_id, drug_id, buyer_id, purchase_date, quantity) VALUES (?, ?, ?, ?, ?)";
+            String purchaseSql = "INSERT INTO purchases (purchase_id, drug_id, buyer_id, purchase_date, quantity) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = null;
             try {
                 // Prepare the statement
@@ -652,6 +654,8 @@ public class DashBoardController {
 
         Sign_out.getScene().getWindow().hide();
     }
+
+
 
     // method to add new drug to the database
 
