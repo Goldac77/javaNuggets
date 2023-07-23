@@ -20,7 +20,8 @@ import java.io.IOException;
 import java.sql.*;
 
 import java.util.Date;
-
+import java.util.List;
+import java.util.ArrayList;
 
 public class DashBoardController {
 
@@ -331,7 +332,7 @@ public class DashBoardController {
 
 
 
-
+    // method to add new drug to the database
     @FXML
     private void handleAddDrugButtonAction(ActionEvent event) throws SQLException {
         if(event.getSource() == New_add) {
@@ -718,9 +719,27 @@ public class DashBoardController {
         Sign_out.getScene().getWindow().hide();
     }
 
+    // Add functionality to the receipt button
+    List<Purchase> purchaseHistory = new ArrayList<>();
+    public void Purchases_receipt(ActionEvent event)
+    {
+        if(purchaseHistory.size() > 0) {
+            Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Last Purchase");
+            alert.setHeaderText("Details of the last purchase");
+            alert.setContentText(lastPurchase.toString());
 
+            alert.showAndWait();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("No purchases found");
+            alert.setContentText("There are no purchases in the history.");
 
-    // method to add new drug to the database
+            alert.showAndWait();
+        }
+    }
 
 
 }
