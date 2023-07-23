@@ -19,6 +19,9 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.sql.*;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class DashBoardController {
 
     @FXML
@@ -617,7 +620,28 @@ public class DashBoardController {
         Sign_out.getScene().getWindow().hide();
     }
 
-    // method to add new drug to the database
+    // Add functionality to the receipt button
+    List<Purchase> purchaseHistory = new ArrayList<>();
+    public void Purchases_receipt(ActionEvent event)
+    {
+        if(purchaseHistory.size() > 0) {
+            Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Last Purchase");
+            alert.setHeaderText("Details of the last purchase");
+            alert.setContentText(lastPurchase.toString());
+
+            alert.showAndWait();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("No purchases found");
+            alert.setContentText("There are no purchases in the history.");
+
+            alert.showAndWait();
+        }
+    }
+
 
 
 }
