@@ -4,7 +4,7 @@ public class Buyer {
     private static int count = 1;
     private String buyerName;
     private String contactNumber;
-    private int id;
+    private Integer id;
 
     public Buyer(String buyerName, String contactNumber) {
         this.buyerName = buyerName;

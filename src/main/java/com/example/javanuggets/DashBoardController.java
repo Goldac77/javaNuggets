@@ -1,6 +1,6 @@
 package com.example.javanuggets;
 import java.sql.PreparedStatement;
-import java.util.HashMap;
+import java.util.*;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +19,7 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.sql.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -220,21 +221,118 @@ public class DashBoardController {
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0);
         New_spinner.setValueFactory(valueFactory);
     }
-
+    @FXML
+    private HashMap<Integer, Buyer> buyerHashTable;
     @FXML
     private HashMap<Integer, Drug> drugHashTable;
 
     @FXML
     private HashMap<Integer, Supplier> supplierHashMap;
+    List<Purchase> purchaseHistory;
 
     public DashBoardController() throws SQLException {
         drugHashTable = new HashMap<>();
         // Spinner<?> newSpinner = new Spinner<>();
         supplierHashMap = new HashMap<>();
+        buyerHashTable = new HashMap<>();
+        purchaseHistory = new ArrayList<>();
 
     }
 
+    @FXML
+    public void buyDrugs(ActionEvent event) throws SQLException {
+        if (event.getSource() == AddPurchase_buy) {
 
+            connectToDatabase(url, username, password);
+
+            String buyerName = AddPurchase_buyerName.getText();
+            String buyerContact = AddPurchase_buyerContact.getText();
+            String drugName = AddPurchase_drugName.getText();
+            Double price = Double.parseDouble(AddPurchase_price.getText());
+            Integer quantity = Integer.parseInt(AddPurchase_quantity.getText());
+
+            AddPurchase_buyerName.clear();
+            AddPurchase_buyerContact.clear();
+            AddPurchase_drugName.clear();
+            AddPurchase_price.clear();
+            AddPurchase_quantity.clear();
+
+
+            Buyer newBuyer = new Buyer(buyerName, buyerContact);
+
+            buyerHashTable.put(newBuyer.getId(), newBuyer);
+
+            // inserting into buyers table in database
+            String sql = "INSERT INTO buyers (buyer_id, buyer_name, buyer_number) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = null;
+            try {
+                // Prepare the statement
+                preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setInt(1, newBuyer.getId());
+                preparedStatement.setString(2, buyerName);
+                preparedStatement.setString(3, buyerContact);
+
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // Get drug Id from map
+            Integer drugID = null;
+            for (Map.Entry<Integer, Drug> entry : drugHashTable.entrySet()) {
+                Drug drug = entry.getValue();
+                if (drug.getDrugName().equals(drugName)) {
+                    drugID = entry.getKey();
+                }
+            }
+
+            // Create purchase object
+            Date purchaseDate = new Date();
+            Integer buyerID = newBuyer.getId();
+
+            Purchase newPurchase = new Purchase(drugID, buyerID, purchaseDate, quantity);
+            Integer purchaseID = newPurchase.getId();
+
+            // Add purchase object into an arraylist
+
+            purchaseHistory.add(newPurchase);
+
+            // inserting into purchase table in database
+            String purchaseSql = "INSERT INTO purchases (purchase_id, drug_id, buyer_id, purchase_date, quantity) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement stmt = null;
+            try {
+                // Prepare the statement
+                stmt = connection.prepareStatement(purchaseSql);
+                stmt.setInt(1, purchaseID);
+                stmt.setInt(2, drugID);
+                stmt.setInt(3, buyerID);
+                stmt.setDate(4, (java.sql.Date) purchaseDate);
+                stmt.setInt(5, quantity);
+
+                stmt.executeUpdate();
+                stmt.close();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Drugs Bought");
+            alert.setHeaderText(null);
+            alert.setContentText("Transaction Completed \n Total amount is " + quantity*price);
+            alert.showAndWait();
+
+        }
+        connection.close();
+    }
+
+
+
+    // method to add new drug to the database
     @FXML
     private void handleAddDrugButtonAction(ActionEvent event) throws SQLException {
         if(event.getSource() == New_add) {
@@ -468,6 +566,55 @@ public class DashBoardController {
         Suppler_tableView.setItems(addSuppliersList);
     }
 
+    // Add functionality to the receipt button
+    public void Purchases_receipt(ActionEvent event)
+    {
+        if(event.getSource() == Purchases_receipt) {
+            if(purchaseHistory.size() > 0) {
+                Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
+                int drugID = lastPurchase.getDrugID();
+                int buyerID = lastPurchase.getBuyerID();
+
+                //Get the drug object...
+                Drug drug = null;
+                for (int key : drugHashTable.keySet()) {
+                    if (key == drugID) {
+                        // Found the drugID, return the corresponding Drug object
+                        drug = drugHashTable.get(key);
+                    }
+                }
+
+                double total = lastPurchase.getQuantity() * drug.getUnitPrice();
+
+                //Get the buyer object...
+                Buyer buyer = null;
+                for(int key : buyerHashTable.keySet()) {
+                    if(key == buyerID) {
+                        buyer = buyerHashTable.get(key);
+                    }
+                }
+
+                String drugName = drug.getDrugName();
+                String buyerName = buyer.getBuyerName();
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Last Purchase");
+                alert.setHeaderText("Details of the last purchase");
+                alert.setContentText("Buyer Name: " + buyerName +
+                        "\nDrug Name: " + drugName + "\nQuantity: "
+                        + lastPurchase.getQuantity() + "\nTotal: " + total);
+
+                alert.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("No purchases found");
+                alert.setContentText("There are no purchases in the history.");
+
+                alert.showAndWait();
+            }
+        }
+    }
 
     //switching between screens
     public void switchForms(ActionEvent event) throws SQLException {
@@ -568,6 +715,7 @@ public class DashBoardController {
         }
     }
 
+
     public void addPurchaseCancel(ActionEvent event){
         Drugs_form.setVisible(false);
         New_form.setVisible(false);
@@ -619,29 +767,6 @@ public class DashBoardController {
 
         Sign_out.getScene().getWindow().hide();
     }
-
-    // Add functionality to the receipt button
-    List<Purchase> purchaseHistory = new ArrayList<>();
-    public void Purchases_receipt(ActionEvent event)
-    {
-        if(purchaseHistory.size() > 0) {
-            Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Last Purchase");
-            alert.setHeaderText("Details of the last purchase");
-            alert.setContentText(lastPurchase.toString());
-
-            alert.showAndWait();
-        } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("No purchases found");
-            alert.setContentText("There are no purchases in the history.");
-
-            alert.showAndWait();
-        }
-    }
-
 
 
 }
