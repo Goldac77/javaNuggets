@@ -566,6 +566,55 @@ public class DashBoardController {
         Suppler_tableView.setItems(addSuppliersList);
     }
 
+    // Add functionality to the receipt button
+    public void Purchases_receipt(ActionEvent event)
+    {
+        if(event.getSource() == Purchases_receipt) {
+            if(purchaseHistory.size() > 0) {
+                Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
+                int drugID = lastPurchase.getDrugID();
+                int buyerID = lastPurchase.getBuyerID();
+
+                //Get the drug object...
+                Drug drug = null;
+                for (int key : drugHashTable.keySet()) {
+                    if (key == drugID) {
+                        // Found the drugID, return the corresponding Drug object
+                        drug = drugHashTable.get(key);
+                    }
+                }
+
+                double total = lastPurchase.getQuantity() * drug.getUnitPrice();
+
+                //Get the buyer object...
+                Buyer buyer = null;
+                for(int key : buyerHashTable.keySet()) {
+                    if(key == buyerID) {
+                        buyer = buyerHashTable.get(key);
+                    }
+                }
+
+                String drugName = drug.getDrugName();
+                String buyerName = buyer.getBuyerName();
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Last Purchase");
+                alert.setHeaderText("Details of the last purchase");
+                alert.setContentText("Buyer Name: " + buyerName +
+                        "\nDrug Name: " + drugName + "\nQuantity: "
+                        + lastPurchase.getQuantity() + "\nTotal: " + total);
+
+                alert.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("No purchases found");
+                alert.setContentText("There are no purchases in the history.");
+
+                alert.showAndWait();
+            }
+        }
+    }
 
     //switching between screens
     public void switchForms(ActionEvent event) throws SQLException {
@@ -717,29 +766,6 @@ public class DashBoardController {
         stage.show();
 
         Sign_out.getScene().getWindow().hide();
-    }
-
-    // Add functionality to the receipt button
-    public void Purchases_receipt(ActionEvent event)
-    {
-        if(event.getSource() == Purchases_receipt) {
-            if(purchaseHistory.size() > 0) {
-                Purchase lastPurchase = purchaseHistory.get(purchaseHistory.size() - 1);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Last Purchase");
-                alert.setHeaderText("Details of the last purchase");
-                alert.setContentText(lastPurchase.toString());
-
-                alert.showAndWait();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("No purchases found");
-                alert.setContentText("There are no purchases in the history.");
-
-                alert.showAndWait();
-            }
-        }
     }
 
 
