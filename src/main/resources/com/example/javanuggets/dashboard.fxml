@@ -165,7 +165,7 @@
                               </AnchorPane>
                               <Label layoutX="25.0" layoutY="71.0" text="Drug Name:" />
                               <TextField fx:id="Delete_drugName" layoutX="91.0" layoutY="68.0" prefHeight="25.0" prefWidth="307.0" />
-                              <Button fx:id="Delete_deleteBtn" layoutX="43.0" layoutY="161.0" mnemonicParsing="false" styleClass="addBtn" stylesheets="@../../../style.css" text="DELETE" />
+                              <Button fx:id="Delete_deleteBtn" layoutX="43.0" layoutY="161.0" mnemonicParsing="false" onAction="#deleteDrugs" styleClass="addBtn" stylesheets="@../../../style.css" text="DELETE" />
                               <Button fx:id="Delete_cancel" layoutX="324.0" layoutY="161.0" mnemonicParsing="false" onAction="#drugsCancel" styleClass="cancelBtn" stylesheets="@../../../style.css" text="CANCEL" />
                            </children>
                            <effect>
@@ -200,7 +200,7 @@
                         </AnchorPane>
                         <TextField layoutX="357.0" layoutY="112.0" prefHeight="25.0" prefWidth="158.0" promptText="Search by date" styleClass="search-bar" stylesheets="@../../../style.css" />
                         <Button fx:id="Purchases_buy" layoutX="29.0" layoutY="114.0" mnemonicParsing="false" onAction="#PurchasesBuy" styleClass="addBtn" stylesheets="@../../../style.css" text="BUY" />
-                        <Button fx:id="Purchases_receipt" layoutX="87.0" layoutY="114.0" mnemonicParsing="false" styleClass="UpdateBtn" stylesheets="@../../../style.css" text="RECEIPT" />
+                        <Button fx:id="Purchases_receipt" layoutX="87.0" layoutY="114.0" mnemonicParsing="false" onAction="#Purchases_receipt" styleClass="UpdateBtn" stylesheets="@../../../style.css" text="RECEIPT" />
                      </children>
                   </AnchorPane>
                   <AnchorPane fx:id="AddPurchase_form" layoutX="215.0" layoutY="8.0" prefHeight="440.0" prefWidth="529.0" visible="false">
@@ -271,7 +271,7 @@
                               </TableView>
                            </children>
                         </AnchorPane>
-                        <TextField fx:id="Supplier_search" layoutX="357.0" layoutY="116.0" prefHeight="25.0" prefWidth="158.0" promptText="search by name" styleClass="search-bar" stylesheets="@../../../style.css" />
+                        <TextField fx:id="Supplier_search" layoutX="357.0" layoutY="116.0" onAction="#searchSupplierName" prefHeight="25.0" prefWidth="158.0" promptText="search by name" styleClass="search-bar" stylesheets="@../../../style.css" />
                         <Button fx:id="supplier_add" layoutX="15.0" layoutY="116.0" mnemonicParsing="false" onAction="#addSupplier" prefHeight="25.0" prefWidth="61.0" styleClass="addBtn" stylesheets="@../../../style.css" text="ADD" />
                      </children>
                   </AnchorPane>
