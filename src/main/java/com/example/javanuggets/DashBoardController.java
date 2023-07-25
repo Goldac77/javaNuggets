@@ -26,9 +26,6 @@ import java.util.ArrayList;
 public class DashBoardController {
 
     @FXML
-    private TextField AddPurchase_amount;
-
-    @FXML
     private Button AddPurchase_buy;
 
     @FXML
@@ -36,9 +33,6 @@ public class DashBoardController {
 
     @FXML
     private TextField AddPurchase_buyerName;
-
-    @FXML
-    private Button AddPurchase_cancel;
 
     @FXML
     private TextField AddPurchase_drugName;
@@ -52,11 +46,6 @@ public class DashBoardController {
     @FXML
     private TextField AddPurchase_quantity;
 
-    @FXML
-    private TextField AddPurchase_total;
-
-    @FXML
-    private Button Delete_cancel;
 
     @FXML
     private Button Delete_deleteBtn;
@@ -76,8 +65,6 @@ public class DashBoardController {
     @FXML
     private AnchorPane Drugs_form;
 
-    @FXML
-    private TextField Drugs_search;
 
     @FXML
     private Button Drugs_tab;
@@ -99,13 +86,7 @@ public class DashBoardController {
     private TableColumn<DrugsData, Integer> Drugs_tableView_col_supplierID;
 
     @FXML
-    private Button Drugs_update;
-
-    @FXML
     private Button New_add;
-
-    @FXML
-    private Button New_cancel;
 
     @FXML
     private TextField New_drugName;
@@ -115,9 +96,6 @@ public class DashBoardController {
 
     @FXML
     private TextField New_price;
-
-   /* @FXML
-    private Spinner<?> New_spinner;*/
 
     @FXML
     private Spinner<Integer> New_spinner;
@@ -195,25 +173,9 @@ public class DashBoardController {
     private AnchorPane supplier_addForm;
 
     @FXML
-    private Button Update_cancel;
-
-    @FXML
-    private TextField Update_drugName;
-
-    @FXML
     private AnchorPane Update_form;
 
     @FXML
-    private TextField Update_price;
-
-    @FXML
-    private TextField Update_supplierID;
-
-    @FXML
-    private Button Update_updateBtn;
-
-    @FXML
-    private Button closeBtn;
 
     public TextField AddSupplierName;
     public TextField AddSupplierEmail;
@@ -224,7 +186,7 @@ public class DashBoardController {
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
-    String password = "daewoo_369";
+    String password = "ezioauditore@77";
     Connection connection;
     private PreparedStatement prepare;
     private ResultSet result;
@@ -255,7 +217,7 @@ public class DashBoardController {
     }
 
     public void deleteDrugs(ActionEvent event) {
-        if (event.getSource() == Drugs_delete) {
+        if (event.getSource() == Delete_deleteBtn) {
 
             Integer drugID = null;
             String deleteName = Delete_drugName.getText();
@@ -404,7 +366,7 @@ public class DashBoardController {
             New_supplierName.clear();
             New_price.clear();
             New_drugName.clear();
-            New_spinner.getValueFactory().setValue(null);
+            initialize();
 
             connectToDatabase(url, username, password);
 
@@ -717,8 +679,6 @@ public class DashBoardController {
     //Search supplier's name
     public void searchSupplierName(ActionEvent event) {
         if(event.getSource() == Supplier_search) {
-            //TODO: search for supplier and update the table
-            // Get the supplier name to search
             String supplierName = Supplier_search.getText();
 
             // Search the supplierHashMap for the corresponding supplierID
