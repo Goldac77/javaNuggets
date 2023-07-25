@@ -530,16 +530,16 @@ public class DashBoardController {
         }
     }
 
-
-
+    // Display drugs in the drugs table
     public ObservableList<DrugsData> addDrugsListData() throws SQLException {
 
         ObservableList<DrugsData> DrugsList = FXCollections.observableArrayList();
 
         String sql = "SELECT * from drugs";
-        connectToDatabase(url, username, password);
+
 
         try{
+            connectToDatabase(url, username, password);
             prepare = connection.prepareStatement(sql);
             result = prepare.executeQuery();
             DrugsData drug;
@@ -580,10 +580,10 @@ public class DashBoardController {
 
         ObservableList<TransactionsData> TransactionsList = FXCollections.observableArrayList();
 
-        String sql = "SELECT * from purchases";
-        connectToDatabase(url, username, password);
+        String sql = "SELECT * FROM purchases ORDER BY purchase_date DESC";;
 
         try{
+            connectToDatabase(url, username, password);
             prepare = connection.prepareStatement(sql);
             result = prepare.executeQuery();
             TransactionsData transaction;
@@ -607,6 +607,7 @@ public class DashBoardController {
         return TransactionsList;
     }
 
+    // Display the transactions in the table
     private ObservableList<TransactionsData> addTransactionsList;
     public void addTransactionsShowListData() throws SQLException {
         addTransactionsList = addTransactionsListData();
@@ -619,14 +620,17 @@ public class DashBoardController {
 
         Purchases_tableView.setItems(addTransactionsList);
     }
+
+    // Create suppliers list and display them in the table
     public ObservableList<SuppliersData> addSuppliersListData() throws SQLException {
 
         ObservableList<SuppliersData> SuppliersList = FXCollections.observableArrayList();
 
         String sql = "SELECT * from suppliers";
-        connectToDatabase(url, username, password);
+
 
         try{
+            connectToDatabase(url, username, password);
             prepare = connection.prepareStatement(sql);
             result = prepare.executeQuery();
             SuppliersData supplier;
