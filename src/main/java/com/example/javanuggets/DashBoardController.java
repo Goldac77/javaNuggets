@@ -138,9 +138,6 @@ public class DashBoardController {
     private Button Purchases_receipt;
 
     @FXML
-    private TableView<?> Purchases_tableView;
-
-    @FXML
     private Button Sign_out;
 
     @FXML
@@ -160,6 +157,24 @@ public class DashBoardController {
 
     @FXML
     private TableColumn<SuppliersData, String> Suppler_tableView_col_supplierName;
+
+    @FXML
+    private TableView<TransactionsData> Purchases_tableView;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_purchaseID;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_drugID;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_buyerID;
+
+    @FXML
+    private TableColumn<TransactionsData, Date> t_purchaseDate;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_quantity;
 
     @FXML
     private AnchorPane Supplier_form;
@@ -209,7 +224,7 @@ public class DashBoardController {
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
-    String password = "ezioauditore@77";
+    String password = "daewoo_369";
     Connection connection;
     private PreparedStatement prepare;
     private ResultSet result;
@@ -237,6 +252,40 @@ public class DashBoardController {
         buyerHashTable = new HashMap<>();
         purchaseHistory = new ArrayList<>();
 
+    }
+
+    public void deleteDrugs(ActionEvent event) {
+        if (event.getSource() == Drugs_delete) {
+
+            Integer drugID = null;
+            String deleteName = Delete_drugName.getText();
+
+            Iterator<Map.Entry<Integer, Drug>> iterator = drugHashTable.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Integer, Drug> entry = iterator.next();
+                Drug drug = entry.getValue();
+                if (drug.getDrugName().equals(deleteName)) {
+                    drugID = entry.getKey();
+                    iterator.remove();
+                    break;
+                }
+            }
+
+            try {
+                connectToDatabase(url, username, password);
+
+
+                if (drugID != null) {
+                    String sql = "DELETE FROM drugs WHERE drug_id = ?";
+                    PreparedStatement statement = connection.prepareStatement(sql);
+                    statement.setInt(2, drugID);
+                    statement.executeUpdate();
+                    statement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -286,6 +335,7 @@ public class DashBoardController {
                 Drug drug = entry.getValue();
                 if (drug.getDrugName().equals(drugName)) {
                     drugID = entry.getKey();
+                    break;
                 }
             }
 
@@ -525,6 +575,50 @@ public class DashBoardController {
         Drugs_tableView.setItems(addDrugsList);
     }
 
+    // Show transactions in table
+    public ObservableList<TransactionsData> addTransactionsListData() throws SQLException {
+
+        ObservableList<TransactionsData> TransactionsList = FXCollections.observableArrayList();
+
+        String sql = "SELECT * from purchases";
+        connectToDatabase(url, username, password);
+
+        try{
+            prepare = connection.prepareStatement(sql);
+            result = prepare.executeQuery();
+            TransactionsData transaction;
+
+            while(result.next()){
+                transaction = new TransactionsData(
+                        result.getInt("purchase_id"),
+                        result.getInt("drug_id"),
+                        result.getInt("buyer_id"),
+                        result.getDate("purchase_date"),
+                        result.getInt("quantity")
+                );
+
+                TransactionsList.add(transaction);
+
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return TransactionsList;
+    }
+
+    private ObservableList<TransactionsData> addTransactionsList;
+    public void addTransactionsShowListData() throws SQLException {
+        addTransactionsList = addTransactionsListData();
+
+        t_purchaseID.setCellValueFactory(new PropertyValueFactory<>("purchaseID"));
+        t_drugID.setCellValueFactory(new PropertyValueFactory<>("drugID"));
+        t_buyerID.setCellValueFactory(new PropertyValueFactory<>("buyerID"));
+        t_purchaseDate.setCellValueFactory(new PropertyValueFactory<>("purchaseDate"));
+        t_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        Purchases_tableView.setItems(addTransactionsList);
+    }
     public ObservableList<SuppliersData> addSuppliersListData() throws SQLException {
 
         ObservableList<SuppliersData> SuppliersList = FXCollections.observableArrayList();
@@ -616,6 +710,82 @@ public class DashBoardController {
         }
     }
 
+    //Search supplier's name
+    public void searchSupplierName(ActionEvent event) {
+        if(event.getSource() == Supplier_search) {
+            //TODO: search for supplier and update the table
+            // Get the supplier name to search
+            String supplierName = Supplier_search.getText();
+
+            // Search the supplierHashMap for the corresponding supplierID
+            int supplierID = findSupplierIDByName(supplierName);
+
+            // If the supplier is found in the hashmap, query the database and show the result in an alert
+            if (supplierID != -1) {
+                try {
+                    connectToDatabase(url, username, password);
+                    if (connection != null) {
+                        String query = "SELECT * FROM suppliers WHERE supplier_id = ?";
+                        PreparedStatement stmt = connection.prepareStatement(query);
+                        stmt.setInt(1, supplierID);
+                        ResultSet rs = stmt.executeQuery();
+
+                        // Process the result and create a message for the alert
+                        StringBuilder alertMessage = new StringBuilder();
+                        while (rs.next()) {
+                            String name = rs.getString("supplier_name");
+                            String contact = rs.getString("contact_number");
+                            String email = rs.getString("email");
+                            String location = rs.getString("location");
+
+                            alertMessage.append("Name: ").append(name).append("\n");
+                            alertMessage.append("Contact: ").append(contact).append("\n");
+                            alertMessage.append("Email: ").append(email).append("\n");
+                            alertMessage.append("Location: ").append(location).append("\n");
+                        }
+                        stmt.close();
+
+                        // Show the alert with the result
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Supplier Information");
+                        alert.setHeaderText(null);
+                        alert.setContentText(alertMessage.toString());
+                        alert.showAndWait();
+                    }
+                } catch (SQLException e) {
+                    // Handle SQLException (display error message or log the exception)
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (connection != null) {
+                            connection.close();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                // Supplier not found in the hashmap, show an alert indicating it
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Supplier Not Found");
+                alert.setHeaderText(null);
+                alert.setContentText("Supplier with the name '" + supplierName + "' not found!");
+                alert.showAndWait();
+            }
+        }
+    }
+
+    // Helper method to find the supplierID by supplierName in the supplierHashMap
+    private int findSupplierIDByName(String supplierName) {
+        for (int supplierID : supplierHashMap.keySet()) {
+            Supplier supplier = supplierHashMap.get(supplierID);
+            if (supplier.getSupplierName().equals(supplierName)) {
+                return supplierID; // Supplier found, return the corresponding supplierID
+            }
+        }
+        return -1; // Supplier not found in the hashmap
+    }
+
     //switching between screens
     public void switchForms(ActionEvent event) throws SQLException {
         if(event.getSource() == Drugs_tab) {
@@ -645,6 +815,7 @@ public class DashBoardController {
             Purchase_tab.setStyle("-fx-background-color: linear-gradient(to bottom right, #19b999,#09948d);");
             Drugs_tab.setStyle("-fx-background: transparent");
             Supplier_tab.setStyle("-fx-background: transparent");
+            addTransactionsShowListData();
 
         } else if (event.getSource()== Supplier_tab) {
 
@@ -670,14 +841,6 @@ public class DashBoardController {
             Drugs_form.setVisible(true);
             New_form.setVisible(true);
             Update_form.setVisible(false);
-            Delete_form.setVisible(false);
-            Purchases_form.setVisible(false);
-            AddPurchase_form.setVisible(false);
-            Supplier_form.setVisible(false);
-        } else if (event.getSource() == Drugs_update) {
-            Drugs_form.setVisible(true);
-            New_form.setVisible(false);
-            Update_form.setVisible(true);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
