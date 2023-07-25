@@ -29,10 +29,6 @@ import javafx.scene.control.Alert.AlertType;
 
 public class DashBoardController {
 
-<<<<<<< Updated upstream
-=======
-    
->>>>>>> Stashed changes
     @FXML
     private Button AddPurchase_buy;
 
@@ -181,8 +177,6 @@ public class DashBoardController {
     private AnchorPane supplier_addForm;
 
     @FXML
-    private AnchorPane Update_form;
-    @FXML
     private TextField Drugs_search;
 
     @FXML
@@ -205,32 +199,33 @@ public class DashBoardController {
     private ResultSet result;
 
 
-    //Database credentials
-   /* String url = "jdbc:mysql://localhost:3306/drugs_inventory";
-    String username = "root";
-    String password = "selvfboss12%";
-    Connection connection; */
-
-
-    //Method to connect to Database
-    public void connectToDatabase(String url, String username, String password) throws SQLException {
-        try {
-            connection = DriverManager.getConnection(url, username, password);
-            System.out.println("Database Connected Successfully");
-        } catch (SQLException error) {
-            System.out.println(error);
-        }
-    }
-
-
     @FXML
     private void initialize() {
         // Set up the Spinner value factory from 0 - 100
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0);
         New_spinner.setValueFactory(valueFactory);
+    }
 
-        // Event listener for search
-        Drugs_search.setOnAction(event -> {
+    @FXML
+    private HashMap<Integer, Buyer> buyerHashTable;
+    @FXML
+    private HashMap<Integer, Drug> drugHashTable;
+
+    @FXML
+    private HashMap<Integer, Supplier> supplierHashMap;
+    List<Purchase> purchaseHistory;
+
+    public DashBoardController() throws SQLException {
+        drugHashTable = new HashMap<>();
+        // Spinner<?> newSpinner = new Spinner<>();
+        supplierHashMap = new HashMap<>();
+        buyerHashTable = new HashMap<>();
+        purchaseHistory = new ArrayList<>();
+
+    }
+
+    public void searchDrugName(ActionEvent event) {
+        if(event.getSource() == Drugs_search) {
             String drugName = Drugs_search.getText();
             int drugId = findDrugIdByName(drugName);
             if (drugId != -1) {
@@ -246,18 +241,14 @@ public class DashBoardController {
 
                     showDrugInfoAlert(supplierId, name, price, quantity);
                 } else {
-                    showErrorMessage("Drug information not found in the database.");
+                    showErrorMessage("Drug information not found in the system.");
                 }
             } else {
-                showErrorMessage("Drug not found in the hash map.");
+                showErrorMessage("Drug not found in system.");
             }
-        });
-
+        }
     }
-<<<<<<< Updated upstream
-    @FXML
-    private HashMap<Integer, Buyer> buyerHashTable;
-=======
+
     // Method fo finding particular drug by using name
     private int findDrugIdByName(String drugName) {
         // Search through the HashMap for the drug ID by drug name
@@ -268,8 +259,6 @@ public class DashBoardController {
         }
         return -1; // Return -1 if drug name not found in the hash map
     }
-
-
 
     private DrugInfo queryDrugFromDatabase(int drugId) {
         String query = "SELECT supplier_id, drug_name, unit_price, quantity FROM drugs WHERE drug_id = ?";
@@ -317,26 +306,6 @@ public class DashBoardController {
         alert.showAndWait();
     }
 
-    @FXML
-    private HashMap<Integer, Buyer> buyerHashTable;
-
->>>>>>> Stashed changes
-    @FXML
-    private HashMap<Integer, Drug> drugHashTable;
-
-    @FXML
-    private HashMap<Integer, Supplier> supplierHashMap;
-    List<Purchase> purchaseHistory;
-
-    public DashBoardController() throws SQLException {
-        drugHashTable = new HashMap<>();
-        // Spinner<?> newSpinner = new Spinner<>();
-        supplierHashMap = new HashMap<>();
-        buyerHashTable = new HashMap<>();
-        purchaseHistory = new ArrayList<>();
-
-    }
-
     public void deleteDrugs(ActionEvent event) {
         if (event.getSource() == Delete_deleteBtn) {
 
@@ -347,7 +316,7 @@ public class DashBoardController {
             while (iterator.hasNext()) {
                 Map.Entry<Integer, Drug> entry = iterator.next();
                 Drug drug = entry.getValue();
-                if (drug.getDrugName().equals(deleteName)) {
+                if (drug.getDrugName().equalsIgnoreCase(deleteName)) {
                     drugID = entry.getKey();
                     iterator.remove();
                     break;
@@ -361,10 +330,16 @@ public class DashBoardController {
                 if (drugID != null) {
                     String sql = "DELETE FROM drugs WHERE drug_id = ?";
                     PreparedStatement statement = connection.prepareStatement(sql);
-                    statement.setInt(2, drugID);
+                    statement.setInt(1, drugID);
                     statement.executeUpdate();
                     statement.close();
                 }
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Drug deleted");
+                alert.setHeaderText(null);
+                alert.setContentText("Drug deleted successfully!");
+                alert.showAndWait();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -395,7 +370,7 @@ public class DashBoardController {
             buyerHashTable.put(newBuyer.getId(), newBuyer);
 
             // inserting into buyers table in database
-            String sql = "INSERT INTO buyers (buyer_id, buyer_name, buyer_number) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO buyers (buyer_id, buyer_name, contact_number) VALUES (?, ?, ?)";
             PreparedStatement preparedStatement = null;
             try {
                 // Prepare the statement
@@ -416,7 +391,7 @@ public class DashBoardController {
             Integer drugID = null;
             for (Map.Entry<Integer, Drug> entry : drugHashTable.entrySet()) {
                 Drug drug = entry.getValue();
-                if (drug.getDrugName().equals(drugName)) {
+                if (drug.getDrugName().equalsIgnoreCase(drugName)) {
                     drugID = entry.getKey();
                     break;
                 }
@@ -542,7 +517,7 @@ public class DashBoardController {
     public int findSupplierKeyByName(String supplierName) {
         for (int key : supplierHashMap.keySet()) {
             Supplier supplier = supplierHashMap.get(key);
-            if (supplier.getSupplierName().equals(supplierName)) {
+            if (supplier.getSupplierName().equalsIgnoreCase(supplierName)) {
                 return key;
             }
         }
@@ -857,11 +832,22 @@ public class DashBoardController {
     private int findSupplierIDByName(String supplierName) {
         for (int supplierID : supplierHashMap.keySet()) {
             Supplier supplier = supplierHashMap.get(supplierID);
-            if (supplier.getSupplierName().equals(supplierName)) {
+            if (supplier.getSupplierName().equalsIgnoreCase(supplierName)) {
                 return supplierID; // Supplier found, return the corresponding supplierID
             }
         }
         return -1; // Supplier not found in the hashmap
+    }
+
+
+    //Method to connect to Database
+    public void connectToDatabase(String url, String username, String password) throws SQLException {
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println("Database Connected Successfully");
+        } catch (SQLException error) {
+            System.out.println(error);
+        }
     }
 
     //switching between screens
@@ -869,7 +855,6 @@ public class DashBoardController {
         if(event.getSource() == Drugs_tab) {
             Drugs_form.setVisible(true);
             New_form.setVisible(false);
-            Update_form.setVisible(false);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
@@ -884,7 +869,6 @@ public class DashBoardController {
         } else if (event.getSource()== Purchase_tab) {
             Drugs_form.setVisible(false);
             New_form.setVisible(false);
-            Update_form.setVisible(false);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(true);
             AddPurchase_form.setVisible(false);
@@ -899,7 +883,6 @@ public class DashBoardController {
 
             Drugs_form.setVisible(false);
             New_form.setVisible(false);
-            Update_form.setVisible(false);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
@@ -918,7 +901,6 @@ public class DashBoardController {
         if(event.getSource() == Drugs_add){
             Drugs_form.setVisible(true);
             New_form.setVisible(true);
-            Update_form.setVisible(false);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
@@ -926,7 +908,6 @@ public class DashBoardController {
         } else if (event.getSource() == Drugs_delete) {
             Drugs_form.setVisible(true);
             New_form.setVisible(false);
-            Update_form.setVisible(false);
             Delete_form.setVisible(true);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
@@ -937,7 +918,6 @@ public class DashBoardController {
     public void drugsCancel(ActionEvent event){
         Drugs_form.setVisible(true);
         New_form.setVisible(false);
-        Update_form.setVisible(false);
         Delete_form.setVisible(false);
         Purchases_form.setVisible(false);
         AddPurchase_form.setVisible(false);
@@ -948,7 +928,6 @@ public class DashBoardController {
         if(event.getSource() == Purchases_buy){
             Drugs_form.setVisible(false);
             New_form.setVisible(false);
-            Update_form.setVisible(false);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(true);
             AddPurchase_form.setVisible(true);
@@ -960,7 +939,6 @@ public class DashBoardController {
     public void addPurchaseCancel(ActionEvent event){
         Drugs_form.setVisible(false);
         New_form.setVisible(false);
-        Update_form.setVisible(false);
         Delete_form.setVisible(false);
         Purchases_form.setVisible(true);
         AddPurchase_form.setVisible(false);
@@ -971,7 +949,6 @@ public class DashBoardController {
         if(event.getSource() == supplier_add){
             Drugs_form.setVisible(false);
             New_form.setVisible(false);
-            Update_form.setVisible(false);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
@@ -984,7 +961,6 @@ public class DashBoardController {
         if(event.getSource() == supplier_cancel){
             Drugs_form.setVisible(false);
             New_form.setVisible(false);
-            Update_form.setVisible(false);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
@@ -1008,12 +984,5 @@ public class DashBoardController {
 
         Sign_out.getScene().getWindow().hide();
     }
-
-<<<<<<< Updated upstream
-=======
-
-
-
->>>>>>> Stashed changes
 
 }
