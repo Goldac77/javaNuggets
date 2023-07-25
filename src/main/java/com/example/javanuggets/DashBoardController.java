@@ -23,8 +23,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+
+
 public class DashBoardController {
 
+<<<<<<< Updated upstream
+=======
+    
+>>>>>>> Stashed changes
     @FXML
     private Button AddPurchase_buy;
 
@@ -174,6 +182,8 @@ public class DashBoardController {
 
     @FXML
     private AnchorPane Update_form;
+    @FXML
+    private TextField Drugs_search;
 
     @FXML
 
@@ -183,13 +193,34 @@ public class DashBoardController {
     public TextField AddSupplierLocation;
     public Button addSupplier_btn;
 
+
+
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
     String password = "ezioauditore@77";
     Connection connection;
+
     private PreparedStatement prepare;
     private ResultSet result;
+
+
+    //Database credentials
+   /* String url = "jdbc:mysql://localhost:3306/drugs_inventory";
+    String username = "root";
+    String password = "selvfboss12%";
+    Connection connection; */
+
+
+    //Method to connect to Database
+    public void connectToDatabase(String url, String username, String password) throws SQLException {
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+            System.out.println("Database Connected Successfully");
+        } catch (SQLException error) {
+            System.out.println(error);
+        }
+    }
 
 
     @FXML
@@ -197,9 +228,99 @@ public class DashBoardController {
         // Set up the Spinner value factory from 0 - 100
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0);
         New_spinner.setValueFactory(valueFactory);
+
+        // Event listener for search
+        Drugs_search.setOnAction(event -> {
+            String drugName = Drugs_search.getText();
+            int drugId = findDrugIdByName(drugName);
+            if (drugId != -1) {
+                // Drug found in the hash map, now query the database
+                DrugInfo drugInfo = queryDrugFromDatabase(drugId);
+
+                // Display the result in an alert dialog
+                if (drugInfo != null) {
+                    int supplierId = drugInfo.getSupplierId();
+                    String name = drugInfo.getDrugName();
+                    double price = drugInfo.getPrice();
+                    int quantity = drugInfo.getQuantity();
+
+                    showDrugInfoAlert(supplierId, name, price, quantity);
+                } else {
+                    showErrorMessage("Drug information not found in the database.");
+                }
+            } else {
+                showErrorMessage("Drug not found in the hash map.");
+            }
+        });
+
     }
+<<<<<<< Updated upstream
     @FXML
     private HashMap<Integer, Buyer> buyerHashTable;
+=======
+    // Method fo finding particular drug by using name
+    private int findDrugIdByName(String drugName) {
+        // Search through the HashMap for the drug ID by drug name
+        for (Drug drug : drugHashTable.values()) {
+            if (drug.getDrugName().equalsIgnoreCase(drugName)) {
+                return drug.getId();
+            }
+        }
+        return -1; // Return -1 if drug name not found in the hash map
+    }
+
+
+
+    private DrugInfo queryDrugFromDatabase(int drugId) {
+        String query = "SELECT supplier_id, drug_name, unit_price, quantity FROM drugs WHERE drug_id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, drugId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int supplierId = resultSet.getInt("supplier_id");
+                String drugName = resultSet.getString("drug_name");
+                double unitPrice = resultSet.getDouble("unit_price");
+                int quantity = resultSet.getInt("quantity");
+
+                return new DrugInfo(drugId, drugName, supplierId, unitPrice, quantity);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if drug not found in the database
+    }
+    // Method for showing drug alert
+
+    private void showDrugInfoAlert(int supplierId, String name, double price, int quantity) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Drug Information");
+        alert.setHeaderText(null);
+        alert.setContentText(
+                "Supplier ID: " + supplierId +
+                        "\nDrug Name: " + name +
+                        "\nPrice: " + price +
+                        "\nQuantity: " + quantity
+        );
+        alert.showAndWait();
+    }
+
+
+
+    // Method for showing error
+    private void showErrorMessage(String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    @FXML
+    private HashMap<Integer, Buyer> buyerHashTable;
+
+>>>>>>> Stashed changes
     @FXML
     private HashMap<Integer, Drug> drugHashTable;
 
@@ -429,15 +550,8 @@ public class DashBoardController {
     }
 
 
-    //Method to connect to Database
-    public void connectToDatabase(String url, String username, String password) throws SQLException {
-        try {
-            connection = DriverManager.getConnection(url, username, password);
-            System.out.println("Database Connected Successfully");
-        } catch (SQLException error) {
-            System.out.println(error);
-        }
-    }
+
+
 
     public void handleAddSupplierButtonAction(ActionEvent event) {
         if (event.getSource() == addSupplier_btn) {
@@ -895,5 +1009,11 @@ public class DashBoardController {
         Sign_out.getScene().getWindow().hide();
     }
 
+<<<<<<< Updated upstream
+=======
+
+
+
+>>>>>>> Stashed changes
 
 }

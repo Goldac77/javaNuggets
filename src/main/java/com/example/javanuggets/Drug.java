@@ -7,13 +7,16 @@ public class Drug {
     private double unitPrice;
     private int quantity;
     private int id;
+    // Added supplier id to the drug class
 
-    public Drug(String drugName, String supplierName, double unitPrice, int quantity) {
+
+    public Drug(String drugName, String supplierName,  double unitPrice, int quantity) {
         this.drugName = drugName;
         this.supplierName = supplierName;
         this.unitPrice = unitPrice;
         this.quantity = quantity;
         this.id = count++;
+
     }
 
     // Getters and setters
