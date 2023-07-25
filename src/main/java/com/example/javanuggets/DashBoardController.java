@@ -138,9 +138,6 @@ public class DashBoardController {
     private Button Purchases_receipt;
 
     @FXML
-    private TableView<?> Purchases_tableView;
-
-    @FXML
     private Button Sign_out;
 
     @FXML
@@ -160,6 +157,24 @@ public class DashBoardController {
 
     @FXML
     private TableColumn<SuppliersData, String> Suppler_tableView_col_supplierName;
+
+    @FXML
+    private TableView<TransactionsData> Purchases_tableView;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_purchaseID;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_drugID;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_buyerID;
+
+    @FXML
+    private TableColumn<TransactionsData, Date> t_purchaseDate;
+
+    @FXML
+    private TableColumn<TransactionsData, Integer> t_quantity;
 
     @FXML
     private AnchorPane Supplier_form;
@@ -209,7 +224,7 @@ public class DashBoardController {
     //Database credentials
     String url = "jdbc:mysql://localhost:3306/pharmacy";
     String username = "root";
-    String password = "ezioauditore@77";
+    String password = "daewoo_369";
     Connection connection;
     private PreparedStatement prepare;
     private ResultSet result;
@@ -237,6 +252,40 @@ public class DashBoardController {
         buyerHashTable = new HashMap<>();
         purchaseHistory = new ArrayList<>();
 
+    }
+
+    public void deleteDrugs(ActionEvent event) {
+        if (event.getSource() == Drugs_delete) {
+
+            Integer drugID = null;
+            String deleteName = Delete_drugName.getText();
+
+            Iterator<Map.Entry<Integer, Drug>> iterator = drugHashTable.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Integer, Drug> entry = iterator.next();
+                Drug drug = entry.getValue();
+                if (drug.getDrugName().equals(deleteName)) {
+                    drugID = entry.getKey();
+                    iterator.remove();
+                    break;
+                }
+            }
+
+            try {
+                connectToDatabase(url, username, password);
+
+
+                if (drugID != null) {
+                    String sql = "DELETE FROM drugs WHERE drug_id = ?";
+                    PreparedStatement statement = connection.prepareStatement(sql);
+                    statement.setInt(2, drugID);
+                    statement.executeUpdate();
+                    statement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -286,6 +335,7 @@ public class DashBoardController {
                 Drug drug = entry.getValue();
                 if (drug.getDrugName().equals(drugName)) {
                     drugID = entry.getKey();
+                    break;
                 }
             }
 
@@ -525,6 +575,50 @@ public class DashBoardController {
         Drugs_tableView.setItems(addDrugsList);
     }
 
+    // Show transactions in table
+    public ObservableList<TransactionsData> addTransactionsListData() throws SQLException {
+
+        ObservableList<TransactionsData> TransactionsList = FXCollections.observableArrayList();
+
+        String sql = "SELECT * from purchases";
+        connectToDatabase(url, username, password);
+
+        try{
+            prepare = connection.prepareStatement(sql);
+            result = prepare.executeQuery();
+            TransactionsData transaction;
+
+            while(result.next()){
+                transaction = new TransactionsData(
+                        result.getInt("purchase_id"),
+                        result.getInt("drug_id"),
+                        result.getInt("buyer_id"),
+                        result.getDate("purchase_date"),
+                        result.getInt("quantity")
+                );
+
+                TransactionsList.add(transaction);
+
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return TransactionsList;
+    }
+
+    private ObservableList<TransactionsData> addTransactionsList;
+    public void addTransactionsShowListData() throws SQLException {
+        addTransactionsList = addTransactionsListData();
+
+        t_purchaseID.setCellValueFactory(new PropertyValueFactory<>("purchaseID"));
+        t_drugID.setCellValueFactory(new PropertyValueFactory<>("drugID"));
+        t_buyerID.setCellValueFactory(new PropertyValueFactory<>("buyerID"));
+        t_purchaseDate.setCellValueFactory(new PropertyValueFactory<>("purchaseDate"));
+        t_quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
+        Purchases_tableView.setItems(addTransactionsList);
+    }
     public ObservableList<SuppliersData> addSuppliersListData() throws SQLException {
 
         ObservableList<SuppliersData> SuppliersList = FXCollections.observableArrayList();
@@ -721,6 +815,7 @@ public class DashBoardController {
             Purchase_tab.setStyle("-fx-background-color: linear-gradient(to bottom right, #19b999,#09948d);");
             Drugs_tab.setStyle("-fx-background: transparent");
             Supplier_tab.setStyle("-fx-background: transparent");
+            addTransactionsShowListData();
 
         } else if (event.getSource()== Supplier_tab) {
 
