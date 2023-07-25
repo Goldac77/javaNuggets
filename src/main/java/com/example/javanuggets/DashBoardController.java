@@ -616,7 +616,81 @@ public class DashBoardController {
         }
     }
 
-    //S
+    //Search supplier's name
+    public void searchSupplierName(ActionEvent event) {
+        if(event.getSource() == Supplier_search) {
+            //TODO: search for supplier and update the table
+            // Get the supplier name to search
+            String supplierName = Supplier_search.getText();
+
+            // Search the supplierHashMap for the corresponding supplierID
+            int supplierID = findSupplierIDByName(supplierName);
+
+            // If the supplier is found in the hashmap, query the database and show the result in an alert
+            if (supplierID != -1) {
+                try {
+                    connectToDatabase(url, username, password);
+                    if (connection != null) {
+                        String query = "SELECT * FROM suppliers WHERE supplier_id = ?";
+                        PreparedStatement stmt = connection.prepareStatement(query);
+                        stmt.setInt(1, supplierID);
+                        ResultSet rs = stmt.executeQuery();
+
+                        // Process the result and create a message for the alert
+                        StringBuilder alertMessage = new StringBuilder();
+                        while (rs.next()) {
+                            String name = rs.getString("supplier_name");
+                            String contact = rs.getString("contact_number");
+                            String email = rs.getString("email");
+                            String location = rs.getString("location");
+
+                            alertMessage.append("Name: ").append(name).append("\n");
+                            alertMessage.append("Contact: ").append(contact).append("\n");
+                            alertMessage.append("Email: ").append(email).append("\n");
+                            alertMessage.append("Location: ").append(location).append("\n");
+                        }
+                        stmt.close();
+
+                        // Show the alert with the result
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Supplier Information");
+                        alert.setHeaderText(null);
+                        alert.setContentText(alertMessage.toString());
+                        alert.showAndWait();
+                    }
+                } catch (SQLException e) {
+                    // Handle SQLException (display error message or log the exception)
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (connection != null) {
+                            connection.close();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                // Supplier not found in the hashmap, show an alert indicating it
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Supplier Not Found");
+                alert.setHeaderText(null);
+                alert.setContentText("Supplier with the name '" + supplierName + "' not found!");
+                alert.showAndWait();
+            }
+        }
+    }
+
+    // Helper method to find the supplierID by supplierName in the supplierHashMap
+    private int findSupplierIDByName(String supplierName) {
+        for (int supplierID : supplierHashMap.keySet()) {
+            Supplier supplier = supplierHashMap.get(supplierID);
+            if (supplier.getSupplierName().equals(supplierName)) {
+                return supplierID; // Supplier found, return the corresponding supplierID
+            }
+        }
+        return -1; // Supplier not found in the hashmap
+    }
 
     //switching between screens
     public void switchForms(ActionEvent event) throws SQLException {
