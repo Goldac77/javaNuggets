@@ -616,6 +616,8 @@ public class DashBoardController {
         }
     }
 
+    //S
+
     //switching between screens
     public void switchForms(ActionEvent event) throws SQLException {
         if(event.getSource() == Drugs_tab) {
@@ -670,14 +672,6 @@ public class DashBoardController {
             Drugs_form.setVisible(true);
             New_form.setVisible(true);
             Update_form.setVisible(false);
-            Delete_form.setVisible(false);
-            Purchases_form.setVisible(false);
-            AddPurchase_form.setVisible(false);
-            Supplier_form.setVisible(false);
-        } else if (event.getSource() == Drugs_update) {
-            Drugs_form.setVisible(true);
-            New_form.setVisible(false);
-            Update_form.setVisible(true);
             Delete_form.setVisible(false);
             Purchases_form.setVisible(false);
             AddPurchase_form.setVisible(false);
