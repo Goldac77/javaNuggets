@@ -19,7 +19,9 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 import java.sql.*;
 
-import java.util.Date;
+import java.sql.Date;
+import java.time.LocalDate;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -398,7 +400,10 @@ public class DashBoardController {
             }
 
             // Create purchase object
-            Date purchaseDate = new Date();
+            LocalDate currentDate = LocalDate.now();
+            // Format date for sql
+            Date purchaseDate = Date.valueOf(currentDate);
+
             Integer buyerID = newBuyer.getId();
 
             Purchase newPurchase = new Purchase(drugID, buyerID, purchaseDate, quantity);
@@ -417,7 +422,7 @@ public class DashBoardController {
                 stmt.setInt(1, purchaseID);
                 stmt.setInt(2, drugID);
                 stmt.setInt(3, buyerID);
-                stmt.setDate(4, (java.sql.Date) purchaseDate);
+                stmt.setDate(4, purchaseDate);
                 stmt.setInt(5, quantity);
 
                 stmt.executeUpdate();
